@@ -118,6 +118,7 @@
     <Compile Include="Reflector\RemoteController.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="OptionsPage.png" />
     <EmbeddedResource Include="Actions.xml" />
     <EmbeddedResource Include="OptionsPage.resx">
       <SubType>Designer</SubType>
@@ -138,9 +139,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="OptionsPage.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

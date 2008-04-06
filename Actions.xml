@@ -2,19 +2,24 @@
 
 <actions>
 
-	<insert group-id="GoTo" position="last">
-		<separator/>
-		<action id="Scout.GotoDeclaration" text="Declaration" overrides="GotoDeclaration" shortcut="Control+B" />
+	<insert group-id="GoTo" position="after" anchor-id="GotoDeclaration">
+		<action id="Scout.GotoDeclaration" text="&amp;Declaration" overrides="ReSharper.ReSharper_GotoDeclaration" shortcut="Control+B" />
 	</insert>
 
-	<insert group-id="VS#Object Browser Objects Pane" vsCommandBar="VS#Object Browser Objects Pane" position="last">
-		<separator/>
-		<action-ref id="Scout.GotoDeclaration"/>
+	<insert group-id="NavigateFromHereMenu" position="after" anchor-id="GotoDeclaration">
+		<action-ref id="Scout.GotoDeclaration" />
 	</insert>
 
-	<insert group-id="VS#Object Browser Members Pane" vsCommandBar="VS#Object Browser Members Pane" position="last" >
-		<separator/>
-		<action-ref id="Scout.GotoDeclaration"/>
+	<insert group-id="VS#Code Window" position="before" anchor-id="NavigateFromHereMenu">
+		<action id="Scout.GotoDeclarationInContextMenu" text="Go to Declaration" overrides="EditorContextMenus.CodeWindow.ReSharper_GotoDeclarationInContextMenu"/>
+	</insert>
+
+	<insert group-id="VS#Object Browser Objects Pane" vsCommandBar="VS#Object Browser Objects Pane" position="first">
+		<action-ref id="Scout.GotoDeclarationInContextMenu"/>
+	</insert>
+
+	<insert group-id="VS#Object Browser Members Pane" vsCommandBar="VS#Object Browser Members Pane" position="first" >
+		<action-ref id="Scout.GotoDeclarationInContextMenu"/>
 	</insert>
 
 	<insert group-id="VS#Reference Item" vsCommandBar="VS#Reference Item" position="last">

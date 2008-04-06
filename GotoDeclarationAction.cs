@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Text;
@@ -21,7 +22,7 @@ namespace ReSharper.Scout
 	using DebugSymbols;
 	using Reflector;
 
-	[ActionHandler("Scout.GotoDeclaration", "Scout.OpenWithReflector")]
+	[ActionHandler("Scout.GotoDeclaration", "Scout.GotoDeclarationInContextMenu", "Scout.OpenWithReflector")]
 	internal class GotoDeclarationAction : IActionHandler
 	{
 		#region IActionHandler Members
@@ -95,89 +96,89 @@ namespace ReSharper.Scout
 			{
 				Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", element.XMLDocId);
 
-				if (element.Module is IProject)
+				if (!(element.Module is IProject))
 				{
-					// An internal declaration
-					//
-					Logger.LogMessage(LoggingLevel.VERBOSE, "An Internal Declaration => ExecuteAction(GotoDeclaration)");
-					ActionManager.Instance.ExecuteAction("GotoDeclaration");
-					return;
-				}
-
-				if (Options.UsePdbFiles && element.Module is IAssembly)
-				{
-					string pathToAssemblyFile  = getAssemblyFile((IAssembly)element.Module);
-					ISymUnmanagedReader reader = getSymbolReader(pathToAssemblyFile);
-					IMetadataMethod[] tokens   = getElementTokens(element);
-
-					if (reader != null && tokens != null && tokens.Length != 0)
+					if (Options.UsePdbFiles && element.Module is IAssembly)
 					{
-						int line = 0, col = 0;
-						string sourceFilePath = null;
+						string pathToAssemblyFile = getAssemblyFile((IAssembly) element.Module);
+						ISymUnmanagedReader reader = getSymbolReader(pathToAssemblyFile);
+						List<IMetadataMethod> tokens = getElementTokens(element);
 
-						for (int i = 0; i < tokens.Length && sourceFilePath == null; i++)
+						if (reader != null && tokens != null && tokens.Count != 0)
 						{
-							IMetadataMethod method = tokens[i];
-							ISymUnmanagedMethod um;
-							if (reader.GetMethod(new SymbolToken((int) method.Token.Value), out um) < 0)
-							{
-								// The pdb file has no source information.
-								//
-								break;
-							}
-							sourceFilePath = getMethodSourceFile(um, out line, out col);
-						}
+							int line = 0, col = 0;
+							string sourceFilePath = null;
 
-						if (sourceFilePath != null)
-						{
-							// Download from the source server if enabled.
-							//
-							if (!File.Exists(sourceFilePath) && reader is ISymUnmanagedSourceServerModule)
+							for (int i = 0; i < tokens.Count && sourceFilePath == null; i++)
 							{
-								ISymUnmanagedSourceServerModule ssm = (ISymUnmanagedSourceServerModule) reader;
-								long moduleCookie = SrcSrv.Instance.LoadModule(pathToAssemblyFile, ssm);
-								if (moduleCookie != 0L)
+								IMetadataMethod method = tokens[i];
+								ISymUnmanagedMethod um;
+								if (reader.GetMethod(new SymbolToken((int) method.Token.Value), out um) < 0)
 								{
-									string sourceFileUrl = SrcSrv.Instance.GetFileUrl(sourceFilePath, moduleCookie);
-									if (!string.IsNullOrEmpty(sourceFileUrl))
+									// The pdb file has no source information.
+									//
+									break;
+								}
+								sourceFilePath = getMethodSourceFile(um, out line, out col);
+							}
+
+							if (sourceFilePath != null)
+							{
+								// Download from the source server if enabled.
+								//
+								if (!File.Exists(sourceFilePath) && reader is ISymUnmanagedSourceServerModule)
+								{
+									ISymUnmanagedSourceServerModule ssm = (ISymUnmanagedSourceServerModule) reader;
+									long moduleCookie = SrcSrv.Instance.LoadModule(pathToAssemblyFile, ssm);
+									if (moduleCookie != 0L)
 									{
-										sourceFilePath = SymSrv.DownloadFile(sourceFileUrl, Options.SymbolCacheDir);
+										string sourceFileUrl = SrcSrv.Instance.GetFileUrl(sourceFilePath, moduleCookie);
+										if (!string.IsNullOrEmpty(sourceFileUrl))
+										{
+											sourceFilePath = SymSrv.DownloadFile(sourceFileUrl, Options.SymbolCacheDir);
+										}
 									}
 								}
-							}
 
-							if (File.Exists(sourceFilePath))
-							{
-								Logger.LogMessage(LoggingLevel.NORMAL, "Open {0}", sourceFilePath);
+								if (File.Exists(sourceFilePath))
+								{
+									Logger.LogMessage(LoggingLevel.NORMAL, "Open {0}", sourceFilePath);
 
-								// Use VS heuristic to figure out the encoding.
-								//
-								Document document = VSShell.Instance.ApplicationObject.ItemOperations.OpenFile(sourceFilePath, EnvDTE.Constants.vsViewKindCode).Document;
-								document.ReadOnly = true;
+									// Use VS heuristic to figure out the encoding.
+									//
+									Document document = VSShell.Instance.ApplicationObject.ItemOperations.OpenFile(
+										sourceFilePath, EnvDTE.Constants.vsViewKindCode).Document;
+									document.ReadOnly = true;
 
-								// Jump to somewhere near to our tarjet.
-								//
-								TextSelection selection = (TextSelection)document.Selection;
-								selection.MoveTo(line, col, false);
+									// Jump to somewhere near to our tarjet.
+									//
+									TextSelection selection = (TextSelection) document.Selection;
+									selection.MoveTo(line, col, false);
 
-								// Adjust the position, is possible.
-								//
-								fineTuneElementPosition(element, sourceFilePath, selection);
-								return;
+									// Adjust the position, is possible.
+									//
+									fineTuneElementPosition(element, sourceFilePath, selection);
+									return;
+								}
 							}
 						}
 					}
+
+					// Pdb recovery was failed or is turned off.
+					//
+					if (Options.UseReflector)
+					{
+						if (element.Module != null)
+							loadModule(element.Module);
+
+						RemoteController.Instance.Select(element.XMLDocId);
+						return;
+					}
 				}
 
-				// Pdb recovery was failed or is turned off.
+				// An internal declaration or nothing is enabled.
 				//
-				if (Options.UseReflector)
-				{
-					if (element.Module != null)
-						loadModule(element.Module);
-
-					RemoteController.Instance.Select(element.XMLDocId);
-				}
+				ActionManager.Instance.ExecuteAction("GotoDeclaration");
 			}
 			else if (Options.UseReflector)
 			{
@@ -358,7 +359,7 @@ namespace ReSharper.Scout
 				assemblyFilePath, symbolPath, 0x0F, out reader) < 0? null: reader;
 		}
 
-		private static IMetadataMethod[] getElementTokens(IDeclaredElement e)
+		private static List<IMetadataMethod> getElementTokens(IDeclaredElement e)
 		{
 			using (AssemblyLoader2 loader = new AssemblyLoader2())
 			{
@@ -368,20 +369,51 @@ namespace ReSharper.Scout
 				{
 					ITypeElement typeElm = e is ITypeElement? (ITypeElement)e: e.GetContainingType();
 					IMetadataTypeInfo typeInfo = mdAssembly.GetTypeInfoFromQualifiedName(typeElm.CLRName, false);
+					List<IMetadataMethod> methods = new List<IMetadataMethod>();
 
 					if (e is IFunction)
 					{
 						IFunction f = (IFunction)e;
-						IMetadataMethod[] matches = Array.FindAll(typeInfo.GetMethods(),
-							delegate(IMetadataMethod m) { return m.Name == f.ShortName && checkSignature(f, m); });
 
-						if (matches.Length != 0)
-							return matches;
+						foreach (IMetadataMethod mm in typeInfo.GetMethods())
+						{
+							if (mm.Name == e.ShortName && checkSignature(f, mm))
+								methods.Add(mm);
+						}
+					}
+					else if (e is IProperty)
+					{
+						foreach (IMetadataProperty mp in typeInfo.GetProperties())
+						{
+							if (mp.Name == e.ShortName)
+								methods.AddRange(mp.Accessors);
+						}
+					}
+					else if (e is IEvent)
+					{
+						foreach (IMetadataEvent me in typeInfo.GetEvents())
+						{
+							if (me.Name == e.ShortName)
+							{
+								if (me.Adder   != null)
+									methods.Add(me.Adder);
+								if (me.Remover != null)
+									methods.Add(me.Remover);
+								if (me.Raiser  != null)
+									methods.Add(me.Raiser);
+
+								methods.AddRange(me.OtherMethods);
+							}
+						}
 					}
 
-					// Property, field, abstract method or something else.
+					// Auto property, field, abstract method or something else.
+					// Simply grab something reated.
 					//
-					return typeInfo.GetMethods();
+					if (methods.Count == 0)
+						methods.AddRange(typeInfo.GetMethods());
+
+					return methods;
 				}
 			}
 
