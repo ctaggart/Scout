@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using JetBrains.Shell.VSIntegration;
 
 namespace ReSharper.Scout.DebugSymbols
 {
@@ -23,6 +24,10 @@ namespace ReSharper.Scout.DebugSymbols
 			//
 			if (File.Exists(cacheFileName))
 				return cacheFileName;
+
+			// Mandatory for EULA dialog.
+			//
+			SymbolServerSetOptions(SSRVOPT_PARENTWIN, (long)VSShell.Instance.MainWindow.Handle);
 
 			IntPtr fileHandle = IntPtr.Zero;
 			IntPtr siteHandle = IntPtr.Zero;
@@ -62,13 +67,14 @@ namespace ReSharper.Scout.DebugSymbols
 
 		#region Interop
 
+		private const uint SSRVOPT_PARENTWIN = 0x80;
 		private const string module = "symsrv.dll";
 
-		[DllImport(module)]
+		[DllImport(module, CharSet=CharSet.Auto)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool SymbolServerSetOptions(uint options, long param);
+		public static extern bool SymbolServerSetOptions(uint options, long handle);
 
-		[DllImport(module)]
+		[DllImport(module, CharSet=CharSet.Auto)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool httpOpenFileHandle(string site, string file, int unused, out IntPtr siteHandle, out IntPtr fileHandle);
 

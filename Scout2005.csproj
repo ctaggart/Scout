@@ -27,67 +27,94 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release31|AnyCPU' ">
+    <ReSharperVersion>31</ReSharperVersion>
+    <OutputPath>..\bin\Release31\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release30|AnyCPU' ">
+    <ReSharperVersion>30</ReSharperVersion>
+    <OutputPath>..\bin\Release30\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release40|AnyCPU' ">
+    <ReSharperVersion>40</ReSharperVersion>
+    <OutputPath>..\bin\Release40\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\envdte.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\envdte.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ActionManagement, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\JetBrains.ActionManagement.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ActionManagement.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.Metadata, Version=3.1.601.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+    <Reference Include="JetBrains.Metadata, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\JetBrains.Metadata.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Metadata.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.IDECore, Version=3.0.517.8, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\JetBrains.ReSharper.IDECore.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.IDECore.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.ProjectModel, Version=3.0.517.8, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\JetBrains.ReSharper.ProjectModel.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.ProjectModel.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.Psi, Version=3.0.517.8, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\JetBrains.ReSharper.Psi.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.Psi.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Shell, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\JetBrains.Shell.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Shell.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.UI, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\JetBrains.UI.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.UI.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Util, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\JetBrains.Util.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Util.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.VSIntegration, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\JetBrains.VSIntegration.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.VSIntegration.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
     </Reference>
     <Reference Include="microsoft.visualstudio.shell.interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\microsoft.visualstudio.shell.interop.8.0.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\microsoft.visualstudio.shell.interop.8.0.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Zip, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Microsoft.VisualStudio.Zip.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\Microsoft.VisualStudio.Zip.dll</HintPath>
       <Aliases>VS8</Aliases>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Zip.9.0, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Microsoft.VisualStudio.Zip.9.0.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\Microsoft.VisualStudio.Zip.9.0.dll</HintPath>
       <Aliases>VS9</Aliases>
     </Reference>
     <Reference Include="System" />
