@@ -26,6 +26,6 @@ internal class AssemblyInfo
 	public const string Product     = "Scout";
 	public const string Company     = "RSDN";
 	public const string Description = "Navigation plugin for ReSharper";
-	public const string Version     = "1.0.6.0";
+	public const string Version     = "1.0.7.0";
 }
 

@@ -4,7 +4,11 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 
 using EnvDTE;
+#if RS40
+using JetBrains.VSIntegration.Shell;
+#else
 using JetBrains.Shell.VSIntegration;
+#endif
 using ReSharper.Scout.Properties;
 
 namespace ReSharper.Scout

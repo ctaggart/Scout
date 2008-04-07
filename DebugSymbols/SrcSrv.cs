@@ -3,7 +3,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
+#if RS40
+using JetBrains.VSIntegration.Shell;
+#else
 using JetBrains.Shell.VSIntegration;
+#endif
 
 namespace ReSharper.Scout.DebugSymbols
 {

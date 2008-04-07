@@ -6,7 +6,11 @@ using System.IO;
 using System.Net;
 
 using JetBrains.Shell.Progress;
+#if RS40
+using JetBrains.VSIntegration.Shell;
+#else
 using JetBrains.Shell.VSIntegration;
+#endif
 using JetBrains.UI.Shell.Progress;
 
 namespace ReSharper.Scout.Reflector

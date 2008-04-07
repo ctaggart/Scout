@@ -14,7 +14,13 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+#if RS40
+using ProjectModelDataConstants=JetBrains.IDE.DataConstants;
+using JetBrains.VSIntegration.Shell;
+#else
 using JetBrains.Shell.VSIntegration;
+using ProjectModelDataConstants=JetBrains.ReSharper.DataConstants;
+#endif
 using JetBrains.Util;
 
 namespace ReSharper.Scout
@@ -71,7 +77,7 @@ namespace ReSharper.Scout
 
 			if (toolWindowKind == ToolWindowGuids80.SolutionExplorer)
 			{
-				IProjectModelElement projectModelElement = context.GetData(DataConstants.PROJECT_MODEL_ELEMENT);
+				IProjectModelElement projectModelElement = context.GetData(ProjectModelDataConstants.PROJECT_MODEL_ELEMENT);
 
 				if (projectModelElement is IModuleReference)
 				{
@@ -191,7 +197,7 @@ namespace ReSharper.Scout
 
 					if (toolWindowKind == ToolWindowGuids80.SolutionExplorer)
 					{
-						IProjectModelElement project = context.GetData(DataConstants.PROJECT_MODEL_ELEMENT);
+						IProjectModelElement project = context.GetData(ProjectModelDataConstants.PROJECT_MODEL_ELEMENT);
 						loadModuleByReference(project);
 					}
 					else if (toolWindowKind == ToolWindowGuids80.ObjectBrowser)
@@ -217,7 +223,12 @@ namespace ReSharper.Scout
 
 				string normalized = selection.Text.Replace("\r\n", "\n").Replace("\n\r", "\n");
 
-				ITreeNode tn = languageService.ParseUsingCapability(normalized, null, element.GetManager().Solution, null);
+				ITreeNode tn = languageService.ParseUsingCapability(normalized, null, element.GetManager().Solution, null)
+#if RS40
+					.ToTreeNode()
+#endif
+					;
+
 				tn = findParsedNode(targetOffset, element, tn);
 				if (tn != null)
 				{

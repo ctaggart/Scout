@@ -1,0 +1,182 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{295F17D5-A38E-4BE6-9757-0495A798919B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ReSharper.Scout</RootNamespace>
+    <AssemblyName>Scout</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug30|AnyCPU' ">
+    <ReSharperVersion>30</ReSharperVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug30\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RS30</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release30|AnyCPU' ">
+    <ReSharperVersion>30</ReSharperVersion>
+    <OutputPath>..\bin\Release30\</OutputPath>
+    <DefineConstants>TRACE;RS30</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release31|AnyCPU' ">
+    <ReSharperVersion>31</ReSharperVersion>
+    <OutputPath>..\bin\Release31\</OutputPath>
+    <DefineConstants>TRACE;RS31</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug31|AnyCPU' ">
+    <ReSharperVersion>31</ReSharperVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\bin\Debug31\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RS31</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\envdte.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ActionManagement, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ActionManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Metadata, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.IDECore, Version=3.0.517.8, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.IDECore.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.ProjectModel, Version=3.0.517.8, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.ProjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.Psi, Version=3.0.517.8, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.Psi.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Shell, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.UI, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Util, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.VSIntegration, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.VSIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="microsoft.visualstudio.shell.interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\microsoft.visualstudio.shell.interop.8.0.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Zip, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Microsoft.VisualStudio.Zip.dll</HintPath>
+      <Aliases>VS8</Aliases>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Zip.9.0, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Microsoft.VisualStudio.Zip.9.0.dll</HintPath>
+      <Aliases>VS9</Aliases>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GotoDeclarationAction.cs" />
+    <Compile Include="DebugSymbols\SymSrv.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Reflector\Downloader.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="OptionsPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reflector\RemoteController.cs" />
+    <Compile Include="DebugSymbols\SrcSrv.cs" />
+    <Compile Include="DebugSymbols\SymUnmanaged.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Actions.xml" />
+    <EmbeddedResource Include="OptionsPage.resx">
+      <DependentUpon>OptionsPage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="OptionsPage.png" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
