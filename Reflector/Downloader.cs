@@ -48,7 +48,7 @@ namespace ReSharper.Scout.Reflector
 			WebResponse response  = request.GetResponse();
 			Stream responseStream = response.GetResponseStream();
 
-			byte[] buffer       = new byte[1024];
+			byte[] buffer       = new byte[8192];
 			long processedBytes = 0;
 			long totalBytes     = response.ContentLength;
 

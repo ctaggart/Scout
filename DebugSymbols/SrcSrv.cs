@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
+using JetBrains.Util;
 #if RS40
 using JetBrains.VSIntegration.Shell;
 #else
@@ -32,6 +33,12 @@ namespace ReSharper.Scout.DebugSymbols
 			SrcSrvSetOptions(1);
 			SrcSrvSetParentWindow(VSShell.Instance.MainWindow.Handle);
 			SrcSrvInit(cookie, VSShell.Instance.UserSettingsLocalDir);
+		}
+
+		private static bool SrcSrvCallback(uint @event, long param1, long param2)
+		{
+			Logger.LogMessage(LoggingLevel.NORMAL, "SrcSrvCallback: {0} {1} {2}", @event, param1, param2);
+			return true;
 		}
 
 		public long LoadModule(string moduleFilePath, ISymUnmanagedSourceServerModule sourceServerModule)
@@ -65,6 +72,8 @@ namespace ReSharper.Scout.DebugSymbols
 
 		public string GetFileUrl(string sourceFilePath, long moduleCookie)
 		{
+			SrcSrvRegisterCallback(_cookie, SrcSrvCallback, moduleCookie);
+
 			if (sourceFilePath == null) throw new ArgumentNullException("sourceFilePath");
 
 			StringBuilder url = new StringBuilder(2048);
@@ -87,6 +96,12 @@ namespace ReSharper.Scout.DebugSymbols
 		[DllImport(module, CharSet=CharSet.Auto)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SrcSrvInit(IntPtr sessionCookie, string workingFolder);
+
+		public delegate bool SrcSrvCallbackProc(uint @event, long param1, long param2);
+
+		[DllImport(module, CharSet=CharSet.Auto)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SrcSrvRegisterCallback(IntPtr sessionCookie, SrcSrvCallbackProc callback, long moduleCookie);
 
 		[DllImport(module)]
 		[return : MarshalAs(UnmanagedType.Bool)]

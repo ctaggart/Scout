@@ -113,5 +113,14 @@ namespace ReSharper.Scout.Properties {
                 return ResourceManager.GetString("Reflector_Uncompressing", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} bytes downloaded.
+        /// </summary>
+        internal static string SymSrv_DownloadProgress {
+            get {
+                return ResourceManager.GetString("SymSrv_DownloadProgress", resourceCulture);
+            }
+        }
     }
 }

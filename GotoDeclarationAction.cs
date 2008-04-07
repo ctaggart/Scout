@@ -27,6 +27,7 @@ namespace ReSharper.Scout
 {
 	using DebugSymbols;
 	using Reflector;
+	using JetBrains.ReSharper.Psi.Caches;
 
 	[ActionHandler("Scout.GotoDeclaration", "Scout.GotoDeclarationInContextMenu", "Scout.OpenWithReflector")]
 	internal class GotoDeclarationAction : IActionHandler
@@ -108,7 +109,7 @@ namespace ReSharper.Scout
 					{
 						string pathToAssemblyFile = getAssemblyFile((IAssembly) element.Module);
 						ISymUnmanagedReader reader = getSymbolReader(pathToAssemblyFile);
-						List<IMetadataMethod> tokens = getElementTokens(element);
+						List<uint> tokens = getElementTokens(element);
 
 						if (reader != null && tokens != null && tokens.Count != 0)
 						{
@@ -117,14 +118,10 @@ namespace ReSharper.Scout
 
 							for (int i = 0; i < tokens.Count && sourceFilePath == null; i++)
 							{
-								IMetadataMethod method = tokens[i];
 								ISymUnmanagedMethod um;
-								if (reader.GetMethod(new SymbolToken((int) method.Token.Value), out um) < 0)
-								{
-									// The pdb file has no source information.
-									//
-									break;
-								}
+								if (reader.GetMethod(new SymbolToken((int) tokens[i]), out um) < 0)
+									continue;
+
 								sourceFilePath = getMethodSourceFile(um, out line, out col);
 							}
 
@@ -370,17 +367,63 @@ namespace ReSharper.Scout
 				assemblyFilePath, symbolPath, 0x0F, out reader) < 0? null: reader;
 		}
 
-		private static List<IMetadataMethod> getElementTokens(IDeclaredElement e)
+#if RS40
+		private static List<uint> getElementTokens(IDeclaredElement elm)
 		{
+			List<uint>   tokens  = new List<uint>();
+			ITypeElement typeElm = elm is ITypeElement ? (ITypeElement)elm : elm.GetContainingType();
+
+			if (elm is IFunction && !((IFunction) elm).IsAbstract && elm is IMetadataTokenOwner)
+			{
+				tokens.Add(((IMetadataTokenOwner)elm).Token);
+			}
+			else if (elm is IProperty)
+			{
+				IProperty prop = (IProperty) elm;
+				IMetadataTokenOwner getter = prop.Getter(true) as IMetadataTokenOwner;
+				IMetadataTokenOwner setter = prop.Setter(true) as IMetadataTokenOwner;
+
+				if (getter != null)
+					tokens.Add(getter.Token);
+				if (setter != null)
+					tokens.Add(setter.Token);
+			}
+			else if (elm is IEvent)
+			{
+				IEvent evt = (IEvent) elm;
+				IMetadataTokenOwner adder   = evt.Adder   as IMetadataTokenOwner;
+				IMetadataTokenOwner remover = evt.Remover as IMetadataTokenOwner;
+				IMetadataTokenOwner raiser  = evt.Raiser  as IMetadataTokenOwner;
+
+				if (adder != null)
+					tokens.Add(adder.Token);
+				if (remover != null)
+					tokens.Add(remover.Token);
+				if (raiser != null)
+					tokens.Add(raiser.Token);
+			}
+
+			foreach (IMethod m in typeElm.Methods)
+			{
+				if (m is IMetadataTokenOwner)
+					tokens.Add(((IMetadataTokenOwner) m).Token);
+			}
+
+			return tokens;
+		}
+#else
+		private static List<uint> getElementTokens(IDeclaredElement e)
+		{
+			List<uint>   tokens  = new List<uint>();
+			ITypeElement typeElm = e is ITypeElement? (ITypeElement)e: e.GetContainingType();
+
 			using (AssemblyLoader2 loader = new AssemblyLoader2())
 			{
 				loader.LoadAssembly((IAssembly)e.Module);
 				IMetadataAssembly mdAssembly = loader.GetMdAssembly((IAssembly)e.Module);
 				if (mdAssembly != null)
 				{
-					ITypeElement typeElm = e is ITypeElement? (ITypeElement)e: e.GetContainingType();
 					IMetadataTypeInfo typeInfo = mdAssembly.GetTypeInfoFromQualifiedName(typeElm.CLRName, false);
-					List<IMetadataMethod> methods = new List<IMetadataMethod>();
 
 					if (e is IFunction)
 					{
@@ -389,47 +432,48 @@ namespace ReSharper.Scout
 						foreach (IMetadataMethod mm in typeInfo.GetMethods())
 						{
 							if (mm.Name == e.ShortName && checkSignature(f, mm))
-								methods.Add(mm);
+								tokens.Add(mm.Token.Value);
 						}
 					}
 					else if (e is IProperty)
 					{
 						foreach (IMetadataProperty mp in typeInfo.GetProperties())
 						{
-							if (mp.Name == e.ShortName)
-								methods.AddRange(mp.Accessors);
+							if (mp.Name != e.ShortName)
+								continue;
+
+							if (mp.Getter   != null)
+								tokens.Add(mp.Getter.Token.Value);
+							if (mp.Setter != null)
+								tokens.Add(mp.Setter.Token.Value);
 						}
 					}
 					else if (e is IEvent)
 					{
 						foreach (IMetadataEvent me in typeInfo.GetEvents())
 						{
-							if (me.Name == e.ShortName)
-							{
-								if (me.Adder   != null)
-									methods.Add(me.Adder);
-								if (me.Remover != null)
-									methods.Add(me.Remover);
-								if (me.Raiser  != null)
-									methods.Add(me.Raiser);
+							if (me.Name != e.ShortName)
+								continue;
 
-								methods.AddRange(me.OtherMethods);
-							}
+							if (me.Adder   != null)
+								tokens.Add(me.Adder.Token.Value);
+							if (me.Remover != null)
+								tokens.Add(me.Remover.Token.Value);
+							if (me.Raiser  != null)
+								tokens.Add(me.Raiser.Token.Value);
 						}
 					}
 
-					// Auto property, field, abstract method or something else.
-					// Simply grab something reated.
-					//
-					if (methods.Count == 0)
-						methods.AddRange(typeInfo.GetMethods());
+					foreach (IMetadataMethod method in typeInfo.GetMethods())
+						tokens.Add(method.Token.Value);
 
-					return methods;
+					return tokens;
 				}
 			}
 
 			return null;
 		}
+#endif
 
 		private static bool checkSignature(IParametersOwner po, IMetadataMethod mm)
 		{
