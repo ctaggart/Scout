@@ -9,10 +9,11 @@ using JetBrains.VSIntegration.Shell;
 #else
 using JetBrains.Shell.VSIntegration;
 #endif
-using ReSharper.Scout.Properties;
 
 namespace ReSharper.Scout
 {
+	using Properties;
+
 	internal static class Options
 	{
 		enum Settings
@@ -144,10 +145,13 @@ namespace ReSharper.Scout
 							return ReflectorPath = process.Name;
 					}
 
-					// Finally. download it.
+					// Finally download it.
 					//
-					if (MessageBox.Show(VSShell.Instance.MainWindow, Resources.Options_ConfirmReflectorDownload, AssemblyInfo.Product, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+					if (MessageBox.Show(VSShell.Instance.MainWindow, Resources.Options_ConfirmReflectorDownload,
+						AssemblyInfo.Product, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+					{
 						return ReflectorPath = Reflector.Downloader.Instance.DownloadReflector();
+					}
 				}
 
 				return value;

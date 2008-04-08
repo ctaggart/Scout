@@ -9,25 +9,26 @@ using EnvDTE;
 using Microsoft.VisualStudio.Shell.Interop;
 
 using JetBrains.ActionManagement;
-using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
+
 #if RS40
 using ProjectModelDataConstants=JetBrains.IDE.DataConstants;
 using JetBrains.VSIntegration.Shell;
+using JetBrains.ReSharper.Psi.Caches;
 #else
-using JetBrains.Shell.VSIntegration;
 using ProjectModelDataConstants=JetBrains.ReSharper.DataConstants;
+using JetBrains.Shell.VSIntegration;
+using JetBrains.Metadata.Reader.API;
 #endif
-using JetBrains.Util;
 
 namespace ReSharper.Scout
 {
 	using DebugSymbols;
 	using Reflector;
-	using JetBrains.ReSharper.Psi.Caches;
 
 	[ActionHandler("Scout.GotoDeclaration", "Scout.GotoDeclarationInContextMenu", "Scout.OpenWithReflector")]
 	internal class GotoDeclarationAction : IActionHandler
@@ -237,9 +238,12 @@ namespace ReSharper.Scout
 			}
 		}
 
-		private static ITreeNode findParsedNode(int targetOffset, IDeclaredElement e, ITreeNode root)
+		private static ITreeNode findParsedNode(int targetOffset, IDeclaredElement elm, ITreeNode root)
 		{
-			if (e is IFunction && !((IFunction)e).IsAbstract)
+			if (elm == null)
+				throw new ArgumentNullException("elm");
+
+			if (elm is IFunction && !((IFunction)elm).IsAbstract)
 			{
 				return root.FindNextNode(delegate(ITreeNode n)
 				{
@@ -253,7 +257,7 @@ namespace ReSharper.Scout
 				});
 			}
 
-			ITypeElement typeToFind  = e is ITypeElement? (ITypeElement)e : e.GetContainingType();
+			ITypeElement typeToFind  = elm is ITypeElement? (ITypeElement)elm : elm.GetContainingType();
 
 			ITypeDeclaration tyDecl = (ITypeDeclaration) root.FindNextNode(delegate(ITreeNode n)
 			{
@@ -278,7 +282,7 @@ namespace ReSharper.Scout
 
 			// We are looking for a type declaration and got one.
 			//
-			if (typeToFind == e)
+			if (elm.Equals(typeToFind))
 				return tyDecl.ToTreeNode();
 
 			// Loop through all type members
@@ -288,7 +292,7 @@ namespace ReSharper.Scout
 				// TODO: There is still an issue with absract methods.
 				// For fields\events\properties name check is enought.
 				//
-				if (memDecl.DeclaredName == e.ShortName)
+				if (memDecl.DeclaredName == elm.ShortName)
 				{
 					return memDecl.ToTreeNode();
 				}
@@ -368,8 +372,12 @@ namespace ReSharper.Scout
 		}
 
 #if RS40
+
 		private static List<uint> getElementTokens(IDeclaredElement elm)
 		{
+			if (elm == null)
+				throw new ArgumentNullException("elm");
+
 			List<uint>   tokens  = new List<uint>();
 			ITypeElement typeElm = elm is ITypeElement ? (ITypeElement)elm : elm.GetContainingType();
 
@@ -403,15 +411,20 @@ namespace ReSharper.Scout
 					tokens.Add(raiser.Token);
 			}
 
-			foreach (IMethod m in typeElm.Methods)
+			if (typeElm != null)
 			{
-				if (m is IMetadataTokenOwner)
-					tokens.Add(((IMetadataTokenOwner) m).Token);
+				foreach (IMethod m in typeElm.Methods)
+				{
+					if (m is IMetadataTokenOwner)
+						tokens.Add(((IMetadataTokenOwner) m).Token);
+				}
 			}
 
 			return tokens;
 		}
+
 #else
+
 		private static List<uint> getElementTokens(IDeclaredElement e)
 		{
 			List<uint>   tokens  = new List<uint>();
@@ -473,7 +486,6 @@ namespace ReSharper.Scout
 
 			return null;
 		}
-#endif
 
 		private static bool checkSignature(IParametersOwner po, IMetadataMethod mm)
 		{
@@ -491,6 +503,8 @@ namespace ReSharper.Scout
 
 			return true;
 		}
+
+#endif
 
 		private static void loadFromStackFrameWindow(_DTE dte)
 		{
@@ -512,7 +526,7 @@ namespace ReSharper.Scout
 				foreach (string line in lines)
 				{
 					string[] columns = line.Split('\t');
-					if (columns != null && columns.Length > 2)
+					if (columns.Length > 2)
 						RemoteController.Instance.LoadAssembly(columns[2]);
 				}
 			}

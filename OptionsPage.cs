@@ -78,7 +78,7 @@ namespace ReSharper.Scout
 
 		#endregion
 
-		#region Winforms designer
+		#region Windows Form Designer generated code
 
 		private void InitializeComponent()
 		{

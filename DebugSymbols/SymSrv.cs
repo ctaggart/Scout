@@ -33,12 +33,13 @@ namespace ReSharper.Scout.DebugSymbols
 			if (File.Exists(cacheFileName))
 				return cacheFileName;
 
-			IntPtr funcPtr = Marshal.GetFunctionPointerForDelegate((SymSrvCallbackProc)SymSrvCallback);
-			SymbolServerSetOptions(SSRVOPT_CALLBACK, (long)funcPtr);
-
 			// Mandatory for EULA dialog.
 			//
 			SymbolServerSetOptions(SSRVOPT_PARENTWIN, (long)VSShell.Instance.MainWindow.Handle);
+
+#if DEBUG
+			SymbolServerSetOptions(SSRVOPT_TRACE, 1);
+#endif
 
 			IntPtr fileHandle = IntPtr.Zero;
 			try
@@ -97,23 +98,20 @@ namespace ReSharper.Scout.DebugSymbols
 			return null;
 		}
 
-		private static bool SymSrvCallback(uint @event, long param1, long param2)
-		{
-			Logger.LogMessage(LoggingLevel.NORMAL, "SymSrvCallback: {0} {1} {2}", @event, param1, param2);
-			return true;
-		}
-
 		#region Interop
 
-		private const uint SSRVOPT_CALLBACK  = 0x01;
-		private const uint SSRVOPT_PARENTWIN = 0x80;
+		private const uint SSRVOPT_CALLBACK  = 0x000001;
+		private const uint SSRVOPT_PARENTWIN = 0x000080;
+		private const uint SSRVOPT_TRACE     = 0x000400;
+		private const uint SSRVOPT_CALLBACKW = 0x010000;
+
 		private const string module = "symsrv.dll";
 
 		public delegate bool SymSrvCallbackProc(uint @event, long param1, long param2);
 
 		[DllImport(module, SetLastError = true, CharSet=CharSet.Auto)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool SymbolServerSetOptions(uint options, long handle);
+		public static extern bool SymbolServerSetOptions(uint flag, long param);
 
 		[DllImport(module, SetLastError = true, CharSet=CharSet.Auto)]
 		[return: MarshalAs(UnmanagedType.Bool)]

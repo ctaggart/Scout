@@ -18,7 +18,7 @@ namespace ReSharper.Scout.DebugSymbols
 
 		private readonly IntPtr _cookie;
 
-		public SrcSrv(): this((IntPtr)Guid.NewGuid().GetHashCode())
+		public SrcSrv(): this(System.Diagnostics.Process.GetCurrentProcess().Handle)
 		{
 		}
 
@@ -32,13 +32,7 @@ namespace ReSharper.Scout.DebugSymbols
 			//
 			SrcSrvSetOptions(1);
 			SrcSrvSetParentWindow(VSShell.Instance.MainWindow.Handle);
-			SrcSrvInit(cookie, VSShell.Instance.UserSettingsLocalDir);
-		}
-
-		private static bool SrcSrvCallback(uint @event, long param1, long param2)
-		{
-			Logger.LogMessage(LoggingLevel.NORMAL, "SrcSrvCallback: {0} {1} {2}", @event, param1, param2);
-			return true;
+			SrcSrvInit(cookie, Options.SymbolCacheDir);
 		}
 
 		public long LoadModule(string moduleFilePath, ISymUnmanagedSourceServerModule sourceServerModule)
@@ -72,8 +66,6 @@ namespace ReSharper.Scout.DebugSymbols
 
 		public string GetFileUrl(string sourceFilePath, long moduleCookie)
 		{
-			SrcSrvRegisterCallback(_cookie, SrcSrvCallback, moduleCookie);
-
 			if (sourceFilePath == null) throw new ArgumentNullException("sourceFilePath");
 
 			StringBuilder url = new StringBuilder(2048);
@@ -86,40 +78,40 @@ namespace ReSharper.Scout.DebugSymbols
 
 		private const string module = "srcsrv.dll";
 
-		[DllImport(module)]
+		[DllImport(module, SetLastError = true)]
 		public static extern uint SrcSrvSetOptions(uint options);
 
-		[DllImport(module)]
+		[DllImport(module, SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SrcSrvSetParentWindow(IntPtr wnd);
 
-		[DllImport(module, CharSet=CharSet.Auto)]
+		[DllImport(module, SetLastError = true, CharSet=CharSet.Auto)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SrcSrvInit(IntPtr sessionCookie, string workingFolder);
 
 		public delegate bool SrcSrvCallbackProc(uint @event, long param1, long param2);
 
-		[DllImport(module, CharSet=CharSet.Auto)]
+		[DllImport(module, SetLastError = true, CharSet=CharSet.Auto)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SrcSrvRegisterCallback(IntPtr sessionCookie, SrcSrvCallbackProc callback, long moduleCookie);
 
-		[DllImport(module)]
+		[DllImport(module, SetLastError = true)]
 		[return : MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SrcSrvIsModuleLoaded(IntPtr sessionCookie, long moduleCookie);
 
-		[DllImport(module, CharSet=CharSet.Auto)]
+		[DllImport(module, SetLastError = true, CharSet=CharSet.Auto)]
 		[return : MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SrcSrvLoadModule(IntPtr sessionCookie, string moduleFileName, long moduleCookie, IntPtr symbolClob, uint clobLen);
 
-		[DllImport(module, CharSet=CharSet.Auto)]
+		[DllImport(module, SetLastError = true, CharSet=CharSet.Auto)]
 		[return : MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SrcSrvGetFile(IntPtr sessionCookie, long moduleCookie, string sourceFileLocalPath, string optParams, StringBuilder buffer, uint bufferlen);
 
-		[DllImport(module, CharSet=CharSet.Auto)]
+		[DllImport(module, SetLastError = true, CharSet=CharSet.Auto)]
 		[return : MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SrcSrvGetToken(IntPtr sessionCookie, long moduleCookie, string sourceFileName, out IntPtr tokenClob, out uint clobLen);
 
-		[DllImport(module, CharSet=CharSet.Auto)]
+		[DllImport(module, SetLastError = true, CharSet=CharSet.Auto)]
 		[return : MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SrcSrvExecToken(IntPtr sessionCookie, IntPtr tokenOut, string optParams, StringBuilder buffer, uint bufferlen);
 
