@@ -5,13 +5,15 @@ using System;
 using System.IO;
 using System.Net;
 
-using JetBrains.Shell.Progress;
+using JetBrains.UI.Shell.Progress;
+
 #if RS40
+using JetBrains.Application.Progress;
 using JetBrains.VSIntegration.Shell;
 #else
+using JetBrains.Shell.Progress;
 using JetBrains.Shell.VSIntegration;
 #endif
-using JetBrains.UI.Shell.Progress;
 
 namespace ReSharper.Scout.Reflector
 {
@@ -34,7 +36,7 @@ namespace ReSharper.Scout.Reflector
 			}
 		}
 
-		private object DownloadTask(IProgressIndicator progress)
+		private static object DownloadTask(IProgressIndicator progress)
 		{
 			Settings settings              = Settings.Default;
 			string tempFilePath            = Path.GetTempFileName();

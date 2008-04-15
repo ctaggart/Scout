@@ -8,5 +8,8 @@
     <Setting Name="Reflector" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Reflector</Value>
     </Setting>
+    <Setting Name="ReflectorHomePage" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://aisto.com/roeder/DotNet/</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

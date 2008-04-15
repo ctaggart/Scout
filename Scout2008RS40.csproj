@@ -14,12 +14,13 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release40|AnyCPU' ">
     <ReSharperVersion>40</ReSharperVersion>
     <RSPlatform>.Platform</RSPlatform>
     <RSPlatformReSharper>.Platform.ReSharper</RSPlatformReSharper>
-    <OutputPath>..\bin\Release40\</OutputPath>
+    <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
     <DefineConstants>TRACE;RS40</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -29,11 +30,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug40|AnyCPU' ">
     <ReSharperVersion>40</ReSharperVersion>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\bin\Debug40\</OutputPath>
+    <OutputPath>..\bin\Debug$(ReSharperVersion)\</OutputPath>
     <DefineConstants>TRACE;DEBUG;RS40</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <LangVersion>ISO-2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -43,6 +45,14 @@
     <Reference Include="JetBrains.Platform.ReSharper.ActionManagement, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.ActionManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.DocumentManager, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.DocumentManager.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.DocumentModel, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.DocumentModel.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.ReSharper.IDE, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -71,6 +81,10 @@
     <Reference Include="JetBrains.Platform.ReSharper.VSIntegration, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.VSIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.TextControl, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.TextControl.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.IDECore, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -103,6 +117,9 @@
       <Aliases>VS9</Aliases>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -130,6 +147,8 @@
     <Compile Include="Reflector\RemoteController.cs" />
     <Compile Include="DebugSymbols\SrcSrv.cs" />
     <Compile Include="DebugSymbols\SymUnmanaged.cs" />
+    <Compile Include="Validation\DirectoryExistAttribute.cs" />
+    <Compile Include="Validation\FileExistAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Actions.xml" />

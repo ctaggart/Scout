@@ -4,6 +4,12 @@ using System.Runtime.InteropServices;
 
 using JetBrains.Util;
 
+#if RS40
+using JetBrains.VSIntegration.Shell;
+#else
+using JetBrains.Shell.VSIntegration;
+#endif
+
 namespace ReSharper.Scout.Reflector
 {
 	internal class RemoteController
@@ -35,16 +41,40 @@ namespace ReSharper.Scout.Reflector
 				if (_reflectorProcess != null)
 					_reflectorProcess.Close();
 
-				string path = Options.ReflectorPath;
-				if (string.IsNullOrEmpty(path))
-					return false;
+				_reflectorProcess = null;
+				if (Options.ReuseAnyReflectorInstance)
+					_reflectorProcess = FindReflectorProcess();
 
-				_reflectorProcess = Process.Start(path);
-				_reflectorProcess.WaitForInputIdle();
+				if (_reflectorProcess == null)
+				{
+					string path = Options.ReflectorPath;
+					if (string.IsNullOrEmpty(path))
+						return false;
+
+					string reflectorConfiguration = Options.ReflectorConfiguration;
+					if (!string.IsNullOrEmpty(reflectorConfiguration))
+						reflectorConfiguration = "/configuration:" + reflectorConfiguration;
+
+					_reflectorProcess = Process.Start(path, reflectorConfiguration);
+					_reflectorProcess.WaitForInputIdle();
+				}
 			}
 
 			Logger.LogMessage(LoggingLevel.VERBOSE, "LoadAssembly {0}", fileName);
 			return sendCopyDataMessage("LoadAssembly\n" + fileName);
+		}
+
+		private static Process FindReflectorProcess()
+		{
+			string reflectorExecutableName = Properties.Settings.Default.Reflector + ".exe";
+
+			foreach (EnvDTE.Process process in VSShell.Instance.ApplicationObject.Debugger.LocalProcesses)
+			{
+				if (process.Name.EndsWith(reflectorExecutableName, StringComparison.OrdinalIgnoreCase))
+					return Process.GetProcessById(process.ProcessID);
+			}
+
+			return null;
 		}
 
 		public bool UnloadAssembly(string fileName)

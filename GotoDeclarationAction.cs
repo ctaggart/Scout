@@ -10,19 +10,25 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 using JetBrains.ActionManagement;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 #if RS40
-using ProjectModelDataConstants=JetBrains.IDE.DataConstants;
+using JetBrains.DocumentModel;
+using JetBrains.IDE;
+using JetBrains.TextControl;
 using JetBrains.VSIntegration.Shell;
 using JetBrains.ReSharper.Psi.Caches;
+using ProjectModelDataConstants=JetBrains.IDE.DataConstants;
 #else
-using ProjectModelDataConstants=JetBrains.ReSharper.DataConstants;
-using JetBrains.Shell.VSIntegration;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Editor;
+using JetBrains.ReSharper.EditorManager;
+using JetBrains.ReSharper.TextControl;
+using JetBrains.Shell.VSIntegration;
+using ProjectModelDataConstants=JetBrains.ReSharper.DataConstants;
 #endif
 
 namespace ReSharper.Scout
@@ -37,22 +43,18 @@ namespace ReSharper.Scout
 
 		public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
 		{
-			if (!isAvailable(context))
-			{
-				return nextUpdate();
-			}
-			return true;
+			return isAvailable(context) || nextUpdate();
 		}
 
 		public void Execute(IDataContext context, DelegateExecute nextExecute)
 		{
-			if (!isAvailable(context))
+			if (isAvailable(context))
 			{
-				nextExecute();
+				execute(context);
 			}
 			else
 			{
-				execute(context);
+				nextExecute();
 			}
 		}
 
@@ -62,7 +64,7 @@ namespace ReSharper.Scout
 
 		private static bool isAvailable(IDataContext context)
 		{
-			IDeclaredElement element = context.GetData(DataConstants.DECLARED_ELEMENT);
+			IDeclaredElement element = context.GetData(JetBrains.ReSharper.DataConstants.DECLARED_ELEMENT);
 
 			if (element != null && element.Module != null &&
 				element.Module.Name != null && !string.IsNullOrEmpty(element.XMLDocId))
@@ -96,9 +98,9 @@ namespace ReSharper.Scout
 			return requiredCommand != null && requiredCommand.IsAvailable;
 		}
 
-		private void execute(IDataContext context)
+		private static void execute(IDataContext context)
 		{
-			IDeclaredElement element = context.GetData(DataConstants.DECLARED_ELEMENT);
+			IDeclaredElement element = context.GetData(JetBrains.ReSharper.DataConstants.DECLARED_ELEMENT);
 
 			if (element != null)
 			{
@@ -148,20 +150,30 @@ namespace ReSharper.Scout
 								{
 									Logger.LogMessage(LoggingLevel.NORMAL, "Open {0}", sourceFilePath);
 
-									// Use VS heuristic to figure out the encoding.
+#if RS40
+									// Open the file as read only.
 									//
-									Document document = VSShell.Instance.ApplicationObject.ItemOperations.OpenFile(
-										sourceFilePath, EnvDTE.Constants.vsViewKindCode).Document;
-									document.ReadOnly = true;
+									ITextControl textControl = EditorManager.GetInstance(element.GetManager().Solution)
+										.OpenFile(sourceFilePath, true, true);
+#else
 
-									// Jump to somewhere near to our tarjet.
+									// Open the file using ReSharper services.
 									//
-									TextSelection selection = (TextSelection) document.Selection;
-									selection.MoveTo(line, col, false);
+									ITextControl textControl = EditorManager.GetInstance(element.GetManager().Solution)
+										.OpenProjectFile(sourceFilePath, true);
+
+									// Open the file again using EnvDTE services to make it ReadOnly.
+									//
+									VSShell.Instance.ApplicationObject.ItemOperations.OpenFile(
+										sourceFilePath, EnvDTE.Constants.vsViewKindCode).Document.ReadOnly = true;
+#endif
+									// Jump to somewhere near to our target.
+									//
+									textControl.CaretModel.MoveTo(new VisualPosition(line - 1, col - 1));
 
 									// Adjust the position, is possible.
 									//
-									fineTuneElementPosition(element, sourceFilePath, selection);
+									fineTuneElementPosition(element, textControl);
 									return;
 								}
 							}
@@ -208,34 +220,35 @@ namespace ReSharper.Scout
 			}
 		}
 
-		private static void fineTuneElementPosition(IDeclaredElement element, string sourceFilePath, TextSelection selection)
+		private static void fineTuneElementPosition(IDeclaredElement element, ITextControl textCtl)
 		{
-			ProjectFileType fileType = ProjectFileTypeRegistry.Instance[new FileSystemPath(sourceFilePath).Extension];
-			PsiLanguageType languageType = ProjectFileLanguageServiceManager.Instance.GetPsiLanguageType(fileType);
+			ISolution solution = element.GetManager().Solution;
+			IProjectFile file = DocumentManager.GetInstance(solution).GetProjectFile(textCtl.Document);
+
+			if (file == null)
+				return;
+
+			PsiLanguageType languageType = ProjectFileLanguageServiceManager.Instance.GetPsiLanguageType(file);
 			LanguageService languageService = LanguageServiceManager.Instance.GetLanguageService(languageType);
-			if (languageService != null)
+
+			if (languageService == null)
+				return;
+
+			int targetOffset = textCtl.CaretModel.Offset;
+
+			ILexer  lexer  = languageService.CreateCachingLexer(textCtl.Document.Buffer);
+			IParser parser = languageService.CreateParser(lexer, solution, null);
+
+			ITreeNode tn = parser.ParseFile().ToTreeNode();
+
+			tn = findParsedNode(targetOffset, element, tn);
+			if (tn != null)
 			{
-				int targetOffset = selection.ActivePoint.AbsoluteCharOffset - 1;
-
-				selection.SelectAll();
-
-				string normalized = selection.Text.Replace("\r\n", "\n").Replace("\n\r", "\n");
-
-				ITreeNode tn = languageService.ParseUsingCapability(normalized, null, element.GetManager().Solution, null)
-#if RS40
-					.ToTreeNode()
-#endif
-					;
-
-				tn = findParsedNode(targetOffset, element, tn);
-				if (tn != null)
-				{
-					JetBrains.Util.TextRange range = (tn is IDeclaration)? ((IDeclaration)tn).GetNameRange(): tn.GetTreeTextRange();
-					targetOffset = range.StartOffset + 1;
-				}
-
-				selection.MoveToAbsoluteOffset(targetOffset, false);
+				JetBrains.Util.TextRange range = (tn is IDeclaration)? ((IDeclaration)tn).GetNameRange(): tn.GetTreeTextRange();
+				targetOffset = range.StartOffset;
 			}
+
+			textCtl.CaretModel.MoveTo(targetOffset);
 		}
 
 		private static ITreeNode findParsedNode(int targetOffset, IDeclaredElement elm, ITreeNode root)
@@ -674,7 +687,7 @@ namespace ReSharper.Scout
 
 			foreach (IAssemblyFile file in assembly.GetFiles())
 			{
-				if (file.IsValid && file.Location != null)
+				if (!file.IsMissing)
 					return file.Location.FullPath;
 			}
 

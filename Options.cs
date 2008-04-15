@@ -30,6 +30,8 @@ namespace ReSharper.Scout
 			// Reflector
 			//
 			ReflectorPath,
+			ReuseAnyReflectorInstance,
+			ReflectorConfiguration,
 		}
 
 		#region Source server settings
@@ -59,7 +61,8 @@ namespace ReSharper.Scout
 		public static string SymbolPath
 		{
 			set { setOption(Settings.SymbolPath, value, null); }
-			get { return getDebuggerOption<string>(Settings.SymbolPath); }
+			get { return getDebuggerOption<string>(Settings.SymbolPath)
+				?? Environment.GetEnvironmentVariable("_NT_SYMBOL_PATH"); }
 		}
 
 		public static bool UseDebuggerSettings
@@ -71,7 +74,7 @@ namespace ReSharper.Scout
 		#endregion
 
 		private static readonly string _myRegistryKeyPath = string.Join("\\",
-			new string[] { VSShell.Instance.ProductRegistryKey, "Plugins", AssemblyInfo.Product, AssemblyInfo.Version });
+			new string[] { VSShell.Instance.ProductRegistryKey, "Plugins", AssemblyInfo.Product, AssemblyInfo.MajorVersion });
 
 		private static T getOption<T>(Settings name, T defaultValue)
 		{
@@ -109,6 +112,18 @@ namespace ReSharper.Scout
 		}
 
 		#region Reflector settings
+
+		public static bool ReuseAnyReflectorInstance
+		{
+			set { setOption(Settings.ReuseAnyReflectorInstance, value, false); }
+			get { return getOption(Settings.ReuseAnyReflectorInstance, false); }
+		}
+
+		public static string ReflectorConfiguration
+		{
+			set { setOption(Settings.ReflectorConfiguration, value, null); }
+			get { return getOption<string>(Settings.ReflectorConfiguration, null); }
+		}
 
 		public static string ReflectorPath
 		{
@@ -152,6 +167,10 @@ namespace ReSharper.Scout
 					{
 						return ReflectorPath = Reflector.Downloader.Instance.DownloadReflector();
 					}
+					
+					// Suppress this question when the user denies it.
+					//
+					UseReflector = false;
 				}
 
 				return value;

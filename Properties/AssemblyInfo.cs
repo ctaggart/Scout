@@ -23,9 +23,10 @@ using JetBrains.UI.Shell.PluginSupport;
 
 internal class AssemblyInfo
 {
-	public const string Product     = "Scout";
-	public const string Company     = "RSDN";
-	public const string Description = "Navigation plugin for ReSharper";
-	public const string Version     = "1.0.8.0";
+	public const string Product      = "Scout";
+	public const string Company      = "RSDN";
+	public const string Description  = "Navigation plugin for ReSharper";
+	public const string MajorVersion = "1.0";
+	public const string Version      = MajorVersion + ".9.0";
 }
 

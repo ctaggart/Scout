@@ -3,7 +3,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-using JetBrains.Util;
 #if RS40
 using JetBrains.VSIntegration.Shell;
 #else

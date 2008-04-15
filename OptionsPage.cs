@@ -1,11 +1,14 @@
 ﻿using System.Windows.Forms;
 using System.Drawing;
 
+using JetBrains.CommonControls.Validation;
 using JetBrains.UI.Options;
-using ReSharper.Scout.Properties;
 
 namespace ReSharper.Scout
 {
+	using Properties;
+	using Validation;
+
 	[
 		OptionsPage(OptionsPage.PageID, AssemblyInfo.Product,
 			"ReSharper.Scout.OptionsPage.png",
@@ -45,6 +48,7 @@ namespace ReSharper.Scout
 
 		public void OnActivated(bool activated)
 		{
+			_formValidator = FormValidator.GetInstance(this);
 		}
 
 		public bool OnOk()
@@ -286,15 +290,19 @@ namespace ReSharper.Scout
 		private RadioButton _useDebuggerSettingsRadioButton;
 		private Label _debuggerOptionsHintLabel;
 		private RadioButton _useCustomSettingsRadioButton;
+		[TextNotEmpty("At least one symbol server should be specified", ValidatorSeverity.Error)]
 		private TextBox _symbolServersTextBox;
+		[DirectoryExists("Directory not exists", ValidatorSeverity.Error)]
 		private TextBox _symbolCacheFolderTextBox;
 		private CheckBox _useReflectorCheckBox;
+		[FileExists("File not exists", ValidatorSeverity.Error)]
 		private TextBox _reflectorPathTextBox;
 		private LinkLabel _reflectorHomepageLinkLabel;
 		private Button _reflectorPathBrowseButton;
 		private Button _symbolCacheBrowseButton;
 
 		private CheckBox _usePdbFilesCheckBox;
+		private IFormValidator _formValidator;
 
 		#endregion
 
@@ -302,7 +310,7 @@ namespace ReSharper.Scout
 
 		private void HandleOpenReflectorSite(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			System.Diagnostics.Process.Start("http://aisto.com/roeder/DotNet/");
+			System.Diagnostics.Process.Start(Settings.Default.ReflectorHomePage);
 		}
 
 		private void HandlePdbGroupCheckedChanged(object sender, System.EventArgs e)

@@ -20,14 +20,15 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\Debug30\</OutputPath>
+    <OutputPath>..\bin\Debug$(ReSharperVersion)\</OutputPath>
     <DefineConstants>TRACE;DEBUG;RS30</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>ISO-2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release30|AnyCPU' ">
     <ReSharperVersion>30</ReSharperVersion>
-    <OutputPath>..\bin\Release30\</OutputPath>
+    <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
     <DefineConstants>TRACE;RS30</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -36,7 +37,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release31|AnyCPU' ">
     <ReSharperVersion>31</ReSharperVersion>
-    <OutputPath>..\bin\Release31\</OutputPath>
+    <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
     <DefineConstants>TRACE;RS31</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -46,7 +47,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug31|AnyCPU' ">
     <ReSharperVersion>31</ReSharperVersion>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\bin\Debug31\</OutputPath>
+    <OutputPath>..\bin\Debug$(ReSharperVersion)\</OutputPath>
     <DefineConstants>TRACE;DEBUG;RS31</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,6 +61,14 @@
     <Reference Include="JetBrains.ActionManagement, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib$(ReSharperVersion)\JetBrains.ActionManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.DocumentManager, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.DocumentManager.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.DocumentModel, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.DocumentModel.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Metadata, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -80,6 +89,10 @@
     <Reference Include="JetBrains.Shell, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib$(ReSharperVersion)\JetBrains.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.TextControl, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.TextControl.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.UI, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -141,6 +154,8 @@
     <Compile Include="Reflector\RemoteController.cs" />
     <Compile Include="DebugSymbols\SrcSrv.cs" />
     <Compile Include="DebugSymbols\SymUnmanaged.cs" />
+    <Compile Include="Validation\DirectoryExistAttribute.cs" />
+    <Compile Include="Validation\FileExistAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Actions.xml" />

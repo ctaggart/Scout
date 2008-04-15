@@ -1,13 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using JetBrains.Shell.Progress;
+
 using JetBrains.UI.Shell.Progress;
 using JetBrains.Util;
 
 #if RS40
+using JetBrains.Application.Progress;
 using JetBrains.VSIntegration.Shell;
 #else
+using JetBrains.Shell.Progress;
 using JetBrains.Shell.VSIntegration;
 #endif
 
