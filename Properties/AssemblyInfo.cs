@@ -15,7 +15,7 @@ using JetBrains.UI.Shell.PluginSupport;
 [assembly: Guid("e5a4cb55-1510-45e1-8961-7e614de1ffb4")]
 [assembly: ComVisible(false)]
 
-[assembly: ActionsXml("ReSharper.Scout.Actions.xml", Precompile=false)]
+[assembly: ActionsXml("ReSharper.Scout.Properties.Actions.xml", Precompile=false)]
 
 [assembly: PluginTitle(AssemblyInfo.Product)]
 [assembly: PluginDescription(AssemblyInfo.Description)]
@@ -27,6 +27,6 @@ internal class AssemblyInfo
 	public const string Company      = "RSDN";
 	public const string Description  = "Navigation plugin for ReSharper";
 	public const string MajorVersion = "1.0";
-	public const string Version      = MajorVersion + ".9.0";
+	public const string Version      = MajorVersion + ".10.0";
 }
 

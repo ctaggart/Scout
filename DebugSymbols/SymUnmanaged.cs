@@ -15,7 +15,7 @@ namespace ReSharper.Scout.DebugSymbols
 	{
 		void GetURL(int cchUrl,
 		            out int pcchUrl,
-		            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szUrl);
+		            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szUrl);
 
 		void GetDocumentType(ref Guid pRetVal);
 

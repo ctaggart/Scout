@@ -14,6 +14,13 @@ namespace ReSharper.Scout
 {
 	using Properties;
 
+	internal enum ReflectorConfiguration
+	{
+		Default,
+		PerSolution,
+		Custom,
+	}
+
 	internal static class Options
 	{
 		enum Settings
@@ -30,8 +37,9 @@ namespace ReSharper.Scout
 			// Reflector
 			//
 			ReflectorPath,
-			ReuseAnyReflectorInstance,
 			ReflectorConfiguration,
+			ReflectorCustomConfiguration,
+			ReuseAnyReflectorInstance,
 		}
 
 		#region Source server settings
@@ -81,7 +89,9 @@ namespace ReSharper.Scout
 			using (RegistryKey key = Registry.CurrentUser.OpenSubKey(_myRegistryKeyPath))
 			{
 				object o = key == null? null: key.GetValue(name.ToString());
-				return o != null? (T)Convert.ChangeType(o, typeof(T)): defaultValue;
+				return o == null? defaultValue: typeof(T).IsEnum?
+					(T)Enum.Parse(typeof(T), o.ToString()):
+					(T)Convert.ChangeType(o, typeof(T));
 			}
 		}
 
@@ -119,10 +129,16 @@ namespace ReSharper.Scout
 			get { return getOption(Settings.ReuseAnyReflectorInstance, false); }
 		}
 
-		public static string ReflectorConfiguration
+		public static ReflectorConfiguration ReflectorConfiguration
 		{
-			set { setOption(Settings.ReflectorConfiguration, value, null); }
-			get { return getOption<string>(Settings.ReflectorConfiguration, null); }
+			set { setOption(Settings.ReflectorConfiguration, value, ReflectorConfiguration.Default); }
+			get { return getOption(Settings.ReflectorConfiguration, ReflectorConfiguration.Default); }
+		}
+
+		public static string ReflectorCustomConfiguration
+		{
+			set { setOption(Settings.ReflectorCustomConfiguration, value, null); }
+			get { return getOption<string>(Settings.ReflectorCustomConfiguration, null); }
 		}
 
 		public static string ReflectorPath

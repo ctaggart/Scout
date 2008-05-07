@@ -21,7 +21,7 @@ namespace ReSharper.Scout.Reflector
 
 	internal class Downloader
 	{
-		public static Downloader Instance = new Downloader();
+		public static readonly Downloader Instance = new Downloader();
 
 		public string DownloadReflector()
 		{
@@ -29,14 +29,14 @@ namespace ReSharper.Scout.Reflector
 			{
 				bool cancelled;
 
-				string path = (string)progressWindow.ExecuteTask(DownloadTask,
+				string path = (string)progressWindow.ExecuteTask(downloadTask,
 					Resources.Reflector_DownloadTask, out cancelled );
 
 				return cancelled ? null : path;
 			}
 		}
 
-		private static object DownloadTask(IProgressIndicator progress)
+		private static object downloadTask(IProgressIndicator progress)
 		{
 			Settings settings              = Settings.Default;
 			string tempFilePath            = Path.GetTempFileName();
@@ -86,13 +86,13 @@ namespace ReSharper.Scout.Reflector
 			return null;
 		}
 
-		private static void Uncompress8(string zipFile, string destFolder)
+		private static void uncompress8(string zipFile, string destFolder)
 		{
 			new VS8::Microsoft.VisualStudio.Zip.ZipFileDecompressor(zipFile)
 				.UncompressToFolder(destFolder, true);
 		}
 
-		private static void Uncompress9(string zipFile, string destFolder)
+		private static void uncompress9(string zipFile, string destFolder)
 		{
 			new VS9::Microsoft.VisualStudio.Zip.ZipFileDecompressor(zipFile)
 				.UncompressToFolder(destFolder, true);
@@ -103,10 +103,10 @@ namespace ReSharper.Scout.Reflector
 			switch (VSShell.Instance.VsVersion.Major)
 			{
 				case 8:
-					Uncompress8(zipFile, destFolder);
+					uncompress8(zipFile, destFolder);
 					break;
 				case 9:
-					Uncompress9(zipFile, destFolder);
+					uncompress9(zipFile, destFolder);
 					break;
 				default:
 					throw new NotSupportedException(string.Format("VS version {0} is not supported", VSShell.Instance.VsVersion));

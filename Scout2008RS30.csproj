@@ -133,7 +133,8 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GotoDeclarationAction.cs" />
+    <Compile Include="Actions\GotoDeclarationAction.cs" />
+    <Compile Include="Actions\OpenWithReflectorAction.cs" />
     <Compile Include="DebugSymbols\SymSrv.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -158,7 +159,6 @@
     <Compile Include="Validation\FileExistAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Actions.xml" />
     <EmbeddedResource Include="OptionsPage.resx">
       <DependentUpon>OptionsPage.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -181,6 +181,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Actions.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

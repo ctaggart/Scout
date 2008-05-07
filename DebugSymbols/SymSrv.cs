@@ -77,10 +77,13 @@ namespace ReSharper.Scout.DebugSymbols
 								}
 							}
 
+							if (!progress.IsCanceled)
+								File.SetAttributes(cacheFileName, FileAttributes.ReadOnly);
+
 							return null;
 						}, cacheFileName, out cancelled);
 
-						return cancelled ? null : cacheFileName;
+						return cancelled? null: cacheFileName;
 					}
 				}
 				else
@@ -102,10 +105,8 @@ namespace ReSharper.Scout.DebugSymbols
 
 		#region Interop
 
-		private const uint SSRVOPT_CALLBACK  = 0x000001;
 		private const uint SSRVOPT_PARENTWIN = 0x000080;
 		private const uint SSRVOPT_TRACE     = 0x000400;
-		private const uint SSRVOPT_CALLBACKW = 0x010000;
 
 		private const string module = "symsrv.dll";
 

@@ -138,4 +138,7 @@
   <data name="SymSrv_DownloadProgress" xml:space="preserve">
     <value>{0} bytes downloaded</value>
   </data>
+  <data name="ConfigFilesFilter" xml:space="preserve">
+    <value>Configuration files (*.cfg)|*.exe|All Files|*</value>
+  </data>
 </root>

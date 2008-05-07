@@ -61,6 +61,15 @@ namespace ReSharper.Scout.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Configuration files (*.cfg)|*.exe|All Files|*.
+        /// </summary>
+        internal static string ConfigFilesFilter {
+            get {
+                return ResourceManager.GetString("ConfigFilesFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Executable files (*.exe)|*.exe|All Files|*.
         /// </summary>
         internal static string ExecutableFilesFilter {

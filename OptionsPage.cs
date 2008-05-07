@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using System.Drawing;
 
 using JetBrains.CommonControls.Validation;
@@ -10,7 +11,7 @@ namespace ReSharper.Scout
 	using Validation;
 
 	[
-		OptionsPage(OptionsPage.PageID, AssemblyInfo.Product,
+		OptionsPage(PageID, AssemblyInfo.Product,
 			"ReSharper.Scout.OptionsPage.png",
 			ParentId = "SearchAndNavigation",
 			Sequence = 1)
@@ -25,6 +26,7 @@ namespace ReSharper.Scout
 
 			SetFontStyle(_usePdbFilesCheckBox,      FontStyle.Bold);
 			SetFontStyle(_useReflectorCheckBox,     FontStyle.Bold);
+			SetFontStyle(_reflectorConfigLabel,     FontStyle.Bold);
 			SetFontStyle(_debuggerOptionsHintLabel, FontStyle.Italic);
 
 			_usePdbFilesCheckBox.Checked            = Options.UsePdbFiles;
@@ -37,6 +39,24 @@ namespace ReSharper.Scout
 
 			if (_useReflectorCheckBox.Checked)
 				_reflectorPathTextBox.Text = Options.ReflectorPath;
+
+			_customConfigTextBox.Text = Options.ReflectorCustomConfiguration;
+			_reuseAnyReflectorCheckBox.Checked = Options.ReuseAnyReflectorInstance;
+
+			switch (Options.ReflectorConfiguration)
+			{
+				case ReflectorConfiguration.Default:
+					_useDefaultConfigRadioButton.Checked = true;
+					break;
+				case ReflectorConfiguration.PerSolution:
+					_usePerSolutionConfigRadioButton.Checked = true;
+					break;
+				case ReflectorConfiguration.Custom:
+					_useCustomConfigRadioButton.Checked = true;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
 
 		private static void SetFontStyle(Control ctl, FontStyle style)
@@ -54,12 +74,31 @@ namespace ReSharper.Scout
 		public bool OnOk()
 		{
 			Options.UsePdbFiles         = _usePdbFilesCheckBox.Checked;
-			Options.UseDebuggerSettings = _useDebuggerSettingsRadioButton.Checked;
-			Options.SymbolPath          = _symbolServersTextBox.Text;
-			Options.SymbolCacheDir      = _symbolCacheFolderTextBox.Text;
+			if (_usePdbFilesCheckBox.Checked)
+			{
+				Options.UseDebuggerSettings = _useDebuggerSettingsRadioButton.Checked;
+				Options.SymbolPath          = _symbolServersTextBox.Text;
+				Options.SymbolCacheDir      = _symbolCacheFolderTextBox.Text;
+			}
 
 			Options.UseReflector  = _useReflectorCheckBox.Checked;
-			Options.ReflectorPath = _reflectorPathTextBox.Text;
+			if (_useReflectorCheckBox.Checked)
+			{
+				Options.ReflectorPath             = _reflectorPathTextBox.Text;
+				Options.ReuseAnyReflectorInstance = _reuseAnyReflectorCheckBox.Checked;
+
+				if (!_reuseAnyReflectorCheckBox.Checked)
+				{
+					if (_useCustomConfigRadioButton.Checked)
+					{
+						Options.ReflectorConfiguration = ReflectorConfiguration.Custom;
+						Options.ReflectorCustomConfiguration = _customConfigTextBox.Text;
+					}
+					else
+						Options.ReflectorConfiguration = _useDefaultConfigRadioButton.Checked?
+							ReflectorConfiguration.Default: ReflectorConfiguration.PerSolution;
+				}
+			}
 
 			return true;
 		}
@@ -67,7 +106,8 @@ namespace ReSharper.Scout
 		public bool ValidatePage()
 		{
 			return (!_useReflectorCheckBox.Checked || _reflectorPathTextBox.TextLength > 0) &&
-				(!_useCustomSettingsRadioButton.Checked || _symbolCacheFolderTextBox.TextLength > 0);
+				(!_useCustomSettingsRadioButton.Checked || _symbolCacheFolderTextBox.TextLength > 0) &&
+				(!_useCustomConfigRadioButton.Checked || _customConfigTextBox.TextLength > 0);
 		}
 
 		public Control Control
@@ -100,6 +140,13 @@ namespace ReSharper.Scout
 			this._symbolCacheFolderTextBox = new System.Windows.Forms.TextBox();
 			this._useReflectorCheckBox = new System.Windows.Forms.CheckBox();
 			this._reflectorPathTextBox = new System.Windows.Forms.TextBox();
+			this._reuseAnyReflectorCheckBox = new System.Windows.Forms.CheckBox();
+			this._useDefaultConfigRadioButton = new System.Windows.Forms.RadioButton();
+			this._usePerSolutionConfigRadioButton = new System.Windows.Forms.RadioButton();
+			this._reflectorConfigLabel = new System.Windows.Forms.Label();
+			this._useCustomConfigRadioButton = new System.Windows.Forms.RadioButton();
+			this._customConfigBrowseButton = new System.Windows.Forms.Button();
+			this._customConfigTextBox = new System.Windows.Forms.TextBox();
 			symbolServersLabel = new System.Windows.Forms.Label();
 			symbolCacheFolder = new System.Windows.Forms.Label();
 			reflectorExecutableLabel = new System.Windows.Forms.Label();
@@ -129,43 +176,43 @@ namespace ReSharper.Scout
 			reflectorExecutableLabel.Location = new System.Drawing.Point(34, 253);
 			reflectorExecutableLabel.Name = "reflectorExecutableLabel";
 			reflectorExecutableLabel.Size = new System.Drawing.Size(133, 13);
-			reflectorExecutableLabel.TabIndex = 11;
+			reflectorExecutableLabel.TabIndex = 10;
 			reflectorExecutableLabel.Text = "Path to the &executable file:";
 			// 
 			// _reflectorHomepageLinkLabel
 			// 
 			this._reflectorHomepageLinkLabel.AutoSize = true;
-			this._reflectorHomepageLinkLabel.Location = new System.Drawing.Point(37, 296);
+			this._reflectorHomepageLinkLabel.Location = new System.Drawing.Point(34, 456);
 			this._reflectorHomepageLinkLabel.Name = "_reflectorHomepageLinkLabel";
 			this._reflectorHomepageLinkLabel.Size = new System.Drawing.Size(130, 13);
-			this._reflectorHomepageLinkLabel.TabIndex = 14;
+			this._reflectorHomepageLinkLabel.TabIndex = 20;
 			this._reflectorHomepageLinkLabel.TabStop = true;
 			this._reflectorHomepageLinkLabel.Text = "Open reflector home page";
-			this._reflectorHomepageLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.HandleOpenReflectorSite);
+			this._reflectorHomepageLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.handleOpenReflectorSite);
 			// 
 			// _symbolCacheBrowseButton
 			// 
 			this._symbolCacheBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this._symbolCacheBrowseButton.Enabled = false;
-			this._symbolCacheBrowseButton.Location = new System.Drawing.Point(343, 179);
+			this._symbolCacheBrowseButton.Location = new System.Drawing.Point(365, 179);
 			this._symbolCacheBrowseButton.Name = "_symbolCacheBrowseButton";
 			this._symbolCacheBrowseButton.Size = new System.Drawing.Size(75, 23);
-			this._symbolCacheBrowseButton.TabIndex = 9;
+			this._symbolCacheBrowseButton.TabIndex = 8;
 			this._symbolCacheBrowseButton.Text = "&Browse…";
 			this._symbolCacheBrowseButton.UseVisualStyleBackColor = true;
-			this._symbolCacheBrowseButton.Click += new System.EventHandler(this.HandleCacheBrowseClick);
+			this._symbolCacheBrowseButton.Click += new System.EventHandler(this.handleCacheBrowseClick);
 			// 
 			// _reflectorPathBrowseButton
 			// 
 			this._reflectorPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this._reflectorPathBrowseButton.Enabled = false;
-			this._reflectorPathBrowseButton.Location = new System.Drawing.Point(343, 267);
+			this._reflectorPathBrowseButton.Location = new System.Drawing.Point(365, 267);
 			this._reflectorPathBrowseButton.Name = "_reflectorPathBrowseButton";
 			this._reflectorPathBrowseButton.Size = new System.Drawing.Size(75, 23);
-			this._reflectorPathBrowseButton.TabIndex = 13;
+			this._reflectorPathBrowseButton.TabIndex = 12;
 			this._reflectorPathBrowseButton.Text = "Bro&wse…";
 			this._reflectorPathBrowseButton.UseVisualStyleBackColor = true;
-			this._reflectorPathBrowseButton.Click += new System.EventHandler(this.HandleReflectorBrowseClick);
+			this._reflectorPathBrowseButton.Click += new System.EventHandler(this.handleReflectorBrowseClick);
 			// 
 			// _usePdbFilesCheckBox
 			// 
@@ -176,11 +223,12 @@ namespace ReSharper.Scout
 			this._usePdbFilesCheckBox.TabIndex = 0;
 			this._usePdbFilesCheckBox.Text = "Recover source locations from program debug database (&pdb) files";
 			this._usePdbFilesCheckBox.UseVisualStyleBackColor = true;
-			this._usePdbFilesCheckBox.CheckedChanged += new System.EventHandler(this.HandlePdbGroupCheckedChanged);
-			this._usePdbFilesCheckBox.EnabledChanged += new System.EventHandler(this.HandlePdbGroupCheckedChanged);
+			this._usePdbFilesCheckBox.CheckedChanged += new System.EventHandler(this.handlePdbGroupCheckedChanged);
+			this._usePdbFilesCheckBox.EnabledChanged += new System.EventHandler(this.handlePdbGroupCheckedChanged);
 			// 
 			// _useDebuggerSettingsRadioButton
 			// 
+			this._useDebuggerSettingsRadioButton.AutoCheck = false;
 			this._useDebuggerSettingsRadioButton.AutoSize = true;
 			this._useDebuggerSettingsRadioButton.Enabled = false;
 			this._useDebuggerSettingsRadioButton.Location = new System.Drawing.Point(37, 37);
@@ -190,6 +238,7 @@ namespace ReSharper.Scout
 			this._useDebuggerSettingsRadioButton.TabStop = true;
 			this._useDebuggerSettingsRadioButton.Text = "Use &debugger settings";
 			this._useDebuggerSettingsRadioButton.UseVisualStyleBackColor = true;
+			this._useDebuggerSettingsRadioButton.Click += new System.EventHandler(this.handlePdbRadioButtonClicked);
 			// 
 			// _debuggerOptionsHintLabel
 			// 
@@ -197,12 +246,13 @@ namespace ReSharper.Scout
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this._debuggerOptionsHintLabel.Location = new System.Drawing.Point(57, 57);
 			this._debuggerOptionsHintLabel.Name = "_debuggerOptionsHintLabel";
-			this._debuggerOptionsHintLabel.Size = new System.Drawing.Size(361, 35);
+			this._debuggerOptionsHintLabel.Size = new System.Drawing.Size(383, 35);
 			this._debuggerOptionsHintLabel.TabIndex = 2;
 			this._debuggerOptionsHintLabel.Text = "Please go to Visual Studio Options -> Debugging -> Symbols to set options.";
 			// 
 			// _useCustomSettingsRadioButton
 			// 
+			this._useCustomSettingsRadioButton.AutoCheck = false;
 			this._useCustomSettingsRadioButton.AutoSize = true;
 			this._useCustomSettingsRadioButton.Enabled = false;
 			this._useCustomSettingsRadioButton.Location = new System.Drawing.Point(37, 95);
@@ -210,10 +260,11 @@ namespace ReSharper.Scout
 			this._useCustomSettingsRadioButton.Size = new System.Drawing.Size(120, 17);
 			this._useCustomSettingsRadioButton.TabIndex = 3;
 			this._useCustomSettingsRadioButton.TabStop = true;
-			this._useCustomSettingsRadioButton.Text = "Use &custom settings";
+			this._useCustomSettingsRadioButton.Text = "Use c&ustom settings";
 			this._useCustomSettingsRadioButton.UseVisualStyleBackColor = true;
-			this._useCustomSettingsRadioButton.CheckedChanged += new System.EventHandler(this.HandleCustomPdbGroupCheckedChanged);
-			this._useCustomSettingsRadioButton.EnabledChanged += new System.EventHandler(this.HandleCustomPdbGroupCheckedChanged);
+			this._useCustomSettingsRadioButton.Click += new System.EventHandler(this.handlePdbRadioButtonClicked);
+			this._useCustomSettingsRadioButton.CheckedChanged += new System.EventHandler(this.handleCustomPdbGroupCheckedChanged);
+			this._useCustomSettingsRadioButton.EnabledChanged += new System.EventHandler(this.handleCustomPdbGroupCheckedChanged);
 			// 
 			// _symbolServersTextBox
 			// 
@@ -224,7 +275,7 @@ namespace ReSharper.Scout
 			this._symbolServersTextBox.Enabled = false;
 			this._symbolServersTextBox.Location = new System.Drawing.Point(60, 131);
 			this._symbolServersTextBox.Name = "_symbolServersTextBox";
-			this._symbolServersTextBox.Size = new System.Drawing.Size(358, 20);
+			this._symbolServersTextBox.Size = new System.Drawing.Size(380, 20);
 			this._symbolServersTextBox.TabIndex = 5;
 			// 
 			// _symbolCacheFolderTextBox
@@ -236,7 +287,7 @@ namespace ReSharper.Scout
 			this._symbolCacheFolderTextBox.Enabled = false;
 			this._symbolCacheFolderTextBox.Location = new System.Drawing.Point(60, 181);
 			this._symbolCacheFolderTextBox.Name = "_symbolCacheFolderTextBox";
-			this._symbolCacheFolderTextBox.Size = new System.Drawing.Size(277, 20);
+			this._symbolCacheFolderTextBox.Size = new System.Drawing.Size(299, 20);
 			this._symbolCacheFolderTextBox.TabIndex = 7;
 			// 
 			// _useReflectorCheckBox
@@ -245,11 +296,11 @@ namespace ReSharper.Scout
 			this._useReflectorCheckBox.Location = new System.Drawing.Point(17, 233);
 			this._useReflectorCheckBox.Name = "_useReflectorCheckBox";
 			this._useReflectorCheckBox.Size = new System.Drawing.Size(187, 17);
-			this._useReflectorCheckBox.TabIndex = 10;
+			this._useReflectorCheckBox.TabIndex = 9;
 			this._useReflectorCheckBox.Text = "Use Lutz Roeder\'s .NET &Reflector";
 			this._useReflectorCheckBox.UseVisualStyleBackColor = true;
-			this._useReflectorCheckBox.CheckedChanged += new System.EventHandler(this.HandleReflectorGroupCheckedChanged);
-			this._useReflectorCheckBox.EnabledChanged += new System.EventHandler(this.HandleReflectorGroupCheckedChanged);
+			this._useReflectorCheckBox.CheckedChanged += new System.EventHandler(this.handleReflectorGroupCheckedChanged);
+			this._useReflectorCheckBox.EnabledChanged += new System.EventHandler(this.handleReflectorGroupCheckedChanged);
 			// 
 			// _reflectorPathTextBox
 			// 
@@ -260,12 +311,105 @@ namespace ReSharper.Scout
 			this._reflectorPathTextBox.Enabled = false;
 			this._reflectorPathTextBox.Location = new System.Drawing.Point(37, 269);
 			this._reflectorPathTextBox.Name = "_reflectorPathTextBox";
-			this._reflectorPathTextBox.Size = new System.Drawing.Size(300, 20);
-			this._reflectorPathTextBox.TabIndex = 12;
+			this._reflectorPathTextBox.Size = new System.Drawing.Size(322, 20);
+			this._reflectorPathTextBox.TabIndex = 11;
+			// 
+			// _reuseAnyReflectorCheckBox
+			// 
+			this._reuseAnyReflectorCheckBox.AutoSize = true;
+			this._reuseAnyReflectorCheckBox.Location = new System.Drawing.Point(37, 306);
+			this._reuseAnyReflectorCheckBox.Name = "_reuseAnyReflectorCheckBox";
+			this._reuseAnyReflectorCheckBox.Size = new System.Drawing.Size(166, 17);
+			this._reuseAnyReflectorCheckBox.TabIndex = 19;
+			this._reuseAnyReflectorCheckBox.Text = "Reuse &any Reflector instance";
+			this._reuseAnyReflectorCheckBox.UseVisualStyleBackColor = true;
+			this._reuseAnyReflectorCheckBox.CheckedChanged += new System.EventHandler(this.handleReuseReflectorCheckedChanged);
+			this._reuseAnyReflectorCheckBox.EnabledChanged += new System.EventHandler(this.handleReuseReflectorCheckedChanged);
+			// 
+			// _useDefaultConfigRadioButton
+			// 
+			this._useDefaultConfigRadioButton.AutoCheck = false;
+			this._useDefaultConfigRadioButton.AutoSize = true;
+			this._useDefaultConfigRadioButton.Location = new System.Drawing.Point(60, 357);
+			this._useDefaultConfigRadioButton.Name = "_useDefaultConfigRadioButton";
+			this._useDefaultConfigRadioButton.Size = new System.Drawing.Size(59, 17);
+			this._useDefaultConfigRadioButton.TabIndex = 14;
+			this._useDefaultConfigRadioButton.TabStop = true;
+			this._useDefaultConfigRadioButton.Text = "Defaul&t";
+			this._useDefaultConfigRadioButton.UseVisualStyleBackColor = true;
+			this._useDefaultConfigRadioButton.Click += new System.EventHandler(this.handleReflectorRadionButtonClicked);
+			// 
+			// _usePerSolutionConfigRadioButton
+			// 
+			this._usePerSolutionConfigRadioButton.AutoCheck = false;
+			this._usePerSolutionConfigRadioButton.AutoSize = true;
+			this._usePerSolutionConfigRadioButton.Location = new System.Drawing.Point(60, 380);
+			this._usePerSolutionConfigRadioButton.Name = "_usePerSolutionConfigRadioButton";
+			this._usePerSolutionConfigRadioButton.Size = new System.Drawing.Size(80, 17);
+			this._usePerSolutionConfigRadioButton.TabIndex = 15;
+			this._usePerSolutionConfigRadioButton.TabStop = true;
+			this._usePerSolutionConfigRadioButton.Text = "Per solutio&n";
+			this._usePerSolutionConfigRadioButton.UseVisualStyleBackColor = true;
+			this._usePerSolutionConfigRadioButton.Click += new System.EventHandler(this.handleReflectorRadionButtonClicked);
+			// 
+			// _reflectorConfigLabel
+			// 
+			this._reflectorConfigLabel.AutoSize = true;
+			this._reflectorConfigLabel.Location = new System.Drawing.Point(34, 341);
+			this._reflectorConfigLabel.Name = "_reflectorConfigLabel";
+			this._reflectorConfigLabel.Size = new System.Drawing.Size(117, 13);
+			this._reflectorConfigLabel.TabIndex = 13;
+			this._reflectorConfigLabel.Text = "Reflector &configuration:";
+			// 
+			// _useCustomConfigRadioButton
+			// 
+			this._useCustomConfigRadioButton.AutoCheck = false;
+			this._useCustomConfigRadioButton.AutoSize = true;
+			this._useCustomConfigRadioButton.Location = new System.Drawing.Point(60, 403);
+			this._useCustomConfigRadioButton.Name = "_useCustomConfigRadioButton";
+			this._useCustomConfigRadioButton.Size = new System.Drawing.Size(63, 17);
+			this._useCustomConfigRadioButton.TabIndex = 16;
+			this._useCustomConfigRadioButton.TabStop = true;
+			this._useCustomConfigRadioButton.Text = "Custo&m:";
+			this._useCustomConfigRadioButton.UseVisualStyleBackColor = true;
+			this._useCustomConfigRadioButton.Click += new System.EventHandler(this.handleReflectorRadionButtonClicked);
+			this._useCustomConfigRadioButton.CheckedChanged += new System.EventHandler(this.handleCustomReflectorConfigGroupCheckedChanged);
+			this._useCustomConfigRadioButton.EnabledChanged += new System.EventHandler(this.handleCustomReflectorConfigGroupCheckedChanged);
+			// 
+			// _customConfigBrowseButton
+			// 
+			this._customConfigBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this._customConfigBrowseButton.Enabled = false;
+			this._customConfigBrowseButton.Location = new System.Drawing.Point(365, 424);
+			this._customConfigBrowseButton.Name = "_customConfigBrowseButton";
+			this._customConfigBrowseButton.Size = new System.Drawing.Size(75, 23);
+			this._customConfigBrowseButton.TabIndex = 18;
+			this._customConfigBrowseButton.Text = "Br&owse…";
+			this._customConfigBrowseButton.UseVisualStyleBackColor = true;
+			this._customConfigBrowseButton.Click += new System.EventHandler(this.handleCustomReflectorConfigBrowseClick);
+			// 
+			// _customConfigTextBox
+			// 
+			this._customConfigTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this._customConfigTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+			this._customConfigTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
+			this._customConfigTextBox.Enabled = false;
+			this._customConfigTextBox.Location = new System.Drawing.Point(78, 426);
+			this._customConfigTextBox.Name = "_customConfigTextBox";
+			this._customConfigTextBox.Size = new System.Drawing.Size(281, 20);
+			this._customConfigTextBox.TabIndex = 17;
 			// 
 			// OptionsPage
 			// 
 			this.AutoSize = true;
+			this.Controls.Add(this._customConfigBrowseButton);
+			this.Controls.Add(this._customConfigTextBox);
+			this.Controls.Add(this._useCustomConfigRadioButton);
+			this.Controls.Add(this._reflectorConfigLabel);
+			this.Controls.Add(this._usePerSolutionConfigRadioButton);
+			this.Controls.Add(this._useDefaultConfigRadioButton);
+			this.Controls.Add(this._reuseAnyReflectorCheckBox);
 			this.Controls.Add(this._reflectorHomepageLinkLabel);
 			this.Controls.Add(this._reflectorPathBrowseButton);
 			this.Controls.Add(this._reflectorPathTextBox);
@@ -281,7 +425,7 @@ namespace ReSharper.Scout
 			this.Controls.Add(this._useDebuggerSettingsRadioButton);
 			this.Controls.Add(this._usePdbFilesCheckBox);
 			this.Name = "OptionsPage";
-			this.Size = new System.Drawing.Size(429, 319);
+			this.Size = new System.Drawing.Size(451, 482);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -302,35 +446,66 @@ namespace ReSharper.Scout
 		private Button _symbolCacheBrowseButton;
 
 		private CheckBox _usePdbFilesCheckBox;
+		private CheckBox _reuseAnyReflectorCheckBox;
+		private RadioButton _useDefaultConfigRadioButton;
+		private RadioButton _usePerSolutionConfigRadioButton;
+		private Label _reflectorConfigLabel;
+		private RadioButton _useCustomConfigRadioButton;
+		private Button _customConfigBrowseButton;
+		[TextIsValidPath("Path must be valid", ValidatorSeverity.Error)]
+		private TextBox _customConfigTextBox;
 		private IFormValidator _formValidator;
 
 		#endregion
 
 		#region Event handlers
 
-		private void HandleOpenReflectorSite(object sender, LinkLabelLinkClickedEventArgs e)
+		private void handleOpenReflectorSite(object sender, LinkLabelLinkClickedEventArgs e)
 		{
 			System.Diagnostics.Process.Start(Settings.Default.ReflectorHomePage);
 		}
 
-		private void HandlePdbGroupCheckedChanged(object sender, System.EventArgs e)
+		private void handlePdbRadioButtonClicked(object sender, EventArgs e)
+		{
+			RadioButton[] group = new RadioButton[]
+				{ _useDebuggerSettingsRadioButton, _useCustomSettingsRadioButton };
+
+			foreach (RadioButton button in group)
+			{
+				button.Checked = button == sender;
+			}
+		}
+
+		private void handleReflectorRadionButtonClicked(object sender, EventArgs e)
+		{
+			RadioButton[] group = new RadioButton[]
+				{ _useDefaultConfigRadioButton, _usePerSolutionConfigRadioButton, _useCustomConfigRadioButton};
+
+			foreach (RadioButton button in group)
+			{
+				button.Checked = button == sender;
+			}
+		}
+
+		private void handlePdbGroupCheckedChanged(object sender, EventArgs e)
 		{
 			CheckBox checkBox = (CheckBox)sender;
 			_useDebuggerSettingsRadioButton.Enabled =
 				_useCustomSettingsRadioButton.Enabled = checkBox.Checked && checkBox.Enabled;
 		}
 
-		private void HandleReflectorGroupCheckedChanged(object sender, System.EventArgs e)
+		private void handleReflectorGroupCheckedChanged(object sender, EventArgs e)
 		{
 			CheckBox checkBox = (CheckBox)sender;
 			_reflectorPathTextBox.Enabled =
+				_reuseAnyReflectorCheckBox.Enabled =
 				_reflectorPathBrowseButton.Enabled = checkBox.Checked && checkBox.Enabled;
 
 			if (_reflectorPathTextBox.Enabled && _reflectorPathTextBox.TextLength == 0)
 				_reflectorPathTextBox.Text = Options.ReflectorPath;
 		}
 
-		private void HandleCustomPdbGroupCheckedChanged(object sender, System.EventArgs e)
+		private void handleCustomPdbGroupCheckedChanged(object sender, EventArgs e)
 		{
 			RadioButton radioButton = (RadioButton)sender;
 			_symbolCacheFolderTextBox.Enabled =
@@ -338,7 +513,23 @@ namespace ReSharper.Scout
 				_symbolCacheBrowseButton.Enabled = radioButton.Checked && radioButton.Enabled;
 		}
 
-		private void HandleReflectorBrowseClick(object sender, System.EventArgs e)
+		private void handleReuseReflectorCheckedChanged(object sender, EventArgs e)
+		{
+			CheckBox checkBox = (CheckBox)sender;
+
+			_useDefaultConfigRadioButton.Enabled =
+			_usePerSolutionConfigRadioButton.Enabled =
+			_useCustomConfigRadioButton.Enabled = !checkBox.Checked && checkBox.Enabled;
+		}
+
+		private void handleCustomReflectorConfigGroupCheckedChanged(object sender, EventArgs e)
+		{
+			RadioButton radioButton = (RadioButton)sender;
+			_customConfigTextBox.Enabled =
+			_customConfigBrowseButton.Enabled = radioButton.Checked && radioButton.Enabled;
+		}
+
+		private void handleReflectorBrowseClick(object sender, EventArgs e)
 		{
 			using (OpenFileDialog dlg = new OpenFileDialog())
 			{
@@ -353,13 +544,28 @@ namespace ReSharper.Scout
 			}
 		}
 
-		private void HandleCacheBrowseClick(object sender, System.EventArgs e)
+		private void handleCacheBrowseClick(object sender, EventArgs e)
 		{
 			using (FolderBrowserDialog dlg = new FolderBrowserDialog())
 			{
 				dlg.SelectedPath = _symbolCacheFolderTextBox.Text;
 				if (dlg.ShowDialog(this) == DialogResult.OK)
 					_symbolCacheFolderTextBox.Text = dlg.SelectedPath;
+			}
+		}
+
+		private void handleCustomReflectorConfigBrowseClick(object sender, EventArgs e)
+		{
+			using (OpenFileDialog dlg = new OpenFileDialog())
+			{
+				dlg.FileName        = _reflectorPathTextBox.Text;
+				dlg.CheckFileExists = false;
+				dlg.Filter          = Resources.ConfigFilesFilter;
+
+				if (DialogResult.OK == dlg.ShowDialog(this))
+				{
+					_customConfigTextBox.Text = dlg.FileName;
+				}
 			}
 		}
 

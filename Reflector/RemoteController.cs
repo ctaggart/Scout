@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
+using JetBrains.ProjectModel;
 using JetBrains.Util;
 
 #if RS40
@@ -51,9 +51,26 @@ namespace ReSharper.Scout.Reflector
 					if (string.IsNullOrEmpty(path))
 						return false;
 
-					string reflectorConfiguration = Options.ReflectorConfiguration;
+					string reflectorConfiguration = null;
+
+					if (!Options.ReuseAnyReflectorInstance)
+					{
+						ReflectorConfiguration cfg = Options.ReflectorConfiguration;
+						if (cfg == ReflectorConfiguration.PerSolution)
+						{
+							ISolution solution = SolutionManager.Instance.CurrentSolution;
+							if (solution != null)
+							{
+								FileSystemPath solutionFile = solution.SolutionFilePath;
+								reflectorConfiguration = solutionFile.ChangeExtension(".reflector.cfg").FullPath;
+							}
+						}
+						else if (cfg == ReflectorConfiguration.Custom)
+							reflectorConfiguration = Options.ReflectorCustomConfiguration;
+					}
+
 					if (!string.IsNullOrEmpty(reflectorConfiguration))
-						reflectorConfiguration = "/configuration:" + reflectorConfiguration;
+						reflectorConfiguration = "\"/configuration:" + reflectorConfiguration + "\"";
 
 					_reflectorProcess = Process.Start(path, reflectorConfiguration);
 					_reflectorProcess.WaitForInputIdle();
