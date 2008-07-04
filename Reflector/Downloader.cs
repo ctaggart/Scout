@@ -40,7 +40,11 @@ namespace ReSharper.Scout.Reflector
 		{
 			Settings settings              = Settings.Default;
 			string tempFilePath            = Path.GetTempFileName();
+#if RS40
+			string reflectorFolder         = VSShell.Instance.UserSettingsLocalDir.Combine(settings.Reflector).FullPath;
+#else
 			string reflectorFolder         = Path.Combine(VSShell.Instance.UserSettingsLocalDir, settings.Reflector);
+#endif
 			string reflectorExecutablePath = Path.Combine(reflectorFolder, settings.Reflector + ".exe");
 
 			progress.Start(100);

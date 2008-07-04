@@ -73,7 +73,6 @@ namespace ReSharper.Scout.Reflector
 						reflectorConfiguration = "\"/configuration:" + reflectorConfiguration + "\"";
 
 					_reflectorProcess = Process.Start(path, reflectorConfiguration);
-					_reflectorProcess.WaitForInputIdle();
 				}
 			}
 

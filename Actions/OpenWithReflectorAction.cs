@@ -158,10 +158,11 @@ namespace ReSharper.Scout.Actions
 
 		private static void loadFromObjectBrowserWindow()
 		{
-			object vsService = VSShell.Instance.GetService(typeof(SVsObjBrowser));
-			IVsNavigationTool vsNavigationTool = vsService as IVsNavigationTool;
-			if (vsNavigationTool == null)
-				return;
+#if RS40
+			IVsNavigationTool vsNavigationTool = VSShell.Instance.GetVsService<SVsObjBrowser, IVsNavigationTool>();
+#else
+			IVsNavigationTool vsNavigationTool = (IVsNavigationTool)VSShell.Instance.GetService(typeof(SVsObjBrowser));
+#endif
 
 			IVsSelectedSymbols ppIVsSelectedSymbols;
 			uint pcItems;

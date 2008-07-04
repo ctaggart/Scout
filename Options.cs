@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -7,6 +6,7 @@ using EnvDTE;
 #if RS40
 using JetBrains.VSIntegration.Shell;
 #else
+using System.IO;
 using JetBrains.Shell.VSIntegration;
 #endif
 
@@ -62,7 +62,11 @@ namespace ReSharper.Scout
 			get
 			{
 				return getDebuggerOption<string>(Settings.SymbolCacheDir) ??
+#if RS40
+					VSShell.Instance.UserSettingsLocalDir.Combine("src").FullPath;
+#else
 					Path.Combine(VSShell.Instance.UserSettingsLocalDir, "src");
+#endif
 			}
 		}
 

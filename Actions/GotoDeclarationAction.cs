@@ -326,9 +326,9 @@ namespace ReSharper.Scout.Actions
 			
 			if (_targetElement is IProperty)
 			{
-				IProperty prop = (IProperty) _targetElement;
-				IMetadataTokenOwner getter = prop.Getter(true) as IMetadataTokenOwner;
-				IMetadataTokenOwner setter = prop.Setter(true) as IMetadataTokenOwner;
+				IProperty prop = (IProperty)_targetElement;
+				IMetadataTokenOwner getter = prop.Getter as IMetadataTokenOwner;
+				IMetadataTokenOwner setter = prop.Setter as IMetadataTokenOwner;
 
 				if (getter != null)
 					yield return getter.Token;
@@ -337,7 +337,7 @@ namespace ReSharper.Scout.Actions
 			}
 			else if (_targetElement is IEvent)
 			{
-				IEvent evt = (IEvent) _targetElement;
+				IEvent evt = (IEvent)_targetElement;
 				IMetadataTokenOwner adder   = evt.Adder   as IMetadataTokenOwner;
 				IMetadataTokenOwner remover = evt.Remover as IMetadataTokenOwner;
 				IMetadataTokenOwner raiser  = evt.Raiser  as IMetadataTokenOwner;
@@ -477,6 +477,10 @@ namespace ReSharper.Scout.Actions
 
 		private static ISymUnmanagedReader getSymbolReader(string assemblyFilePath)
 		{
+#if RS40
+			IVsSmartOpenScope vsScope = VSShell.Instance
+				.GetVsService<SVsSmartOpenScope, IVsSmartOpenScope>();
+#else
 			IVsSmartOpenScope vsScope = (IVsSmartOpenScope)
 				VSShell.Instance.GetService(typeof (SVsSmartOpenScope));
 
@@ -487,6 +491,7 @@ namespace ReSharper.Scout.Actions
 				Logger.LogMessage(LoggingLevel.NORMAL, "Failed to query VS for IVsSmartOpenScope");
 				return null;
 			}
+#endif
 
 			Guid iid = JetBrains.Metadata.Access.Constants.IID_IMetaDataImport;
 			ISymUnmanagedBinder2 binder = (ISymUnmanagedBinder2) new JetBrains.Metadata.Access.CorSymBinder_SxSClass();
@@ -558,7 +563,8 @@ namespace ReSharper.Scout.Actions
 #if RS40
 			// Open the file as read only.
 			//
-			ITextControl textControl = EditorManager.GetInstance(_solution).OpenFile(sourceFilePath, true, true);
+			ITextControl textControl = EditorManager.GetInstance(_solution)
+				.OpenFile(sourceFilePath, true, true);
 #else
 			// Open the file using ReSharper services.
 			//
@@ -574,7 +580,7 @@ namespace ReSharper.Scout.Actions
 			if (textControl == null)
 			{
 #if RS40
-				_gotSomeDocuments = VSShell.Instance.ApplicationObject.ItemOperations.OpenFile(
+				_gotSomeDocuments |= VSShell.Instance.ApplicationObject.ItemOperations.OpenFile(
 					sourceFilePath, EnvDTE.Constants.vsViewKindCode) != null;
 #endif
 				return -1;
@@ -599,7 +605,7 @@ namespace ReSharper.Scout.Actions
 
 			// Convert line & row into a plain offset value.
 			//
-			return textControl.VisualToLogical(new VisualPosition(line, column)).Offset;
+			return textControl.VisualToLogical(new VisualPosition(line - 1, column - 1)).Offset;
 		}
 
 		#endregion
