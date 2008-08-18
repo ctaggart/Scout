@@ -38,19 +38,18 @@ namespace ReSharper.Scout.Reflector
 
 		private static object downloadTask(IProgressIndicator progress)
 		{
-			Settings settings              = Settings.Default;
 			string tempFilePath            = Path.GetTempFileName();
 #if RS40
-			string reflectorFolder         = VSShell.Instance.UserSettingsLocalDir.Combine(settings.Reflector).FullPath;
+			string reflectorFolder         = VSShell.Instance.UserSettingsLocalDir.Combine(Resources.Reflector).FullPath;
 #else
-			string reflectorFolder         = Path.Combine(VSShell.Instance.UserSettingsLocalDir, settings.Reflector);
+			string reflectorFolder         = Path.Combine(VSShell.Instance.UserSettingsLocalDir, Resources.Reflector);
 #endif
-			string reflectorExecutablePath = Path.Combine(reflectorFolder, settings.Reflector + ".exe");
+			string reflectorExecutablePath = Path.Combine(reflectorFolder, Resources.Reflector + ".exe");
 
 			progress.Start(100);
 			progress.CurrentItemText = Resources.Reflector_DownloadStarted;
 
-			WebRequest request    = WebRequest.Create(settings.ReflectorUrl);
+			WebRequest request    = WebRequest.Create(Resources.Reflector_Url);
 			WebResponse response  = request.GetResponse();
 			Stream responseStream = response.GetResponseStream();
 

@@ -24,10 +24,10 @@ namespace ReSharper.Scout
 		{
 			InitializeComponent();
 
-			SetFontStyle(_usePdbFilesCheckBox,      FontStyle.Bold);
-			SetFontStyle(_useReflectorCheckBox,     FontStyle.Bold);
-			SetFontStyle(_reflectorConfigLabel,     FontStyle.Bold);
-			SetFontStyle(_debuggerOptionsHintLabel, FontStyle.Italic);
+			setFontStyle(_usePdbFilesCheckBox,      FontStyle.Bold);
+			setFontStyle(_useReflectorCheckBox,     FontStyle.Bold);
+			setFontStyle(_reflectorConfigLabel,     FontStyle.Bold);
+			setFontStyle(_debuggerOptionsHintLabel, FontStyle.Italic);
 
 			_usePdbFilesCheckBox.Checked            = Options.UsePdbFiles;
 			_useDebuggerSettingsRadioButton.Checked = Options.UseDebuggerSettings;
@@ -59,7 +59,7 @@ namespace ReSharper.Scout
 			}
 		}
 
-		private static void SetFontStyle(Control ctl, FontStyle style)
+		private static void setFontStyle(Control ctl, FontStyle style)
 		{
 			ctl.Font = new Font(ctl.Font, style);
 		}
@@ -73,7 +73,8 @@ namespace ReSharper.Scout
 
 		public bool OnOk()
 		{
-			Options.UsePdbFiles         = _usePdbFilesCheckBox.Checked;
+			Options.UsePdbFiles = _usePdbFilesCheckBox.Checked;
+
 			if (_usePdbFilesCheckBox.Checked)
 			{
 				Options.UseDebuggerSettings = _useDebuggerSettingsRadioButton.Checked;
@@ -462,7 +463,7 @@ namespace ReSharper.Scout
 
 		private void handleOpenReflectorSite(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			System.Diagnostics.Process.Start(Settings.Default.ReflectorHomePage);
+			System.Diagnostics.Process.Start(Resources.Reflector_HomePage);
 		}
 
 		private void handlePdbRadioButtonClicked(object sender, EventArgs e)

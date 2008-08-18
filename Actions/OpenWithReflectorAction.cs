@@ -3,11 +3,11 @@ using System.Text;
 using System.Windows.Forms;
 
 using EnvDTE;
-using JetBrains.ProjectModel.Build;
 using Microsoft.VisualStudio.Shell.Interop;
 
 using JetBrains.ActionManagement;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.Build;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
@@ -67,11 +67,28 @@ namespace ReSharper.Scout.Actions
 				return true;
 			}
 
+			//
+			// DTE only related code.
+			//
+
 			_DTE dte = VSShell.Instance.ApplicationObject;
 			if (dte.ActiveWindow == null)
 				return false;
 
-			string  toolWindowKind  = dte.ActiveWindow.ObjectKind;
+			string  toolWindowKind;
+
+			try
+			{
+				toolWindowKind = dte.ActiveWindow.ObjectKind;
+			}
+			catch (NotImplementedException)
+			{
+				// Unbelievable, but possible. See http://www.jetbrains.net/jira/browse/RSPL-313
+				//
+				return false;
+			}
+
+			
 			Command requiredCommand = null;
 
 			if (toolWindowKind == ToolWindowGuids80.SolutionExplorer)
@@ -90,7 +107,9 @@ namespace ReSharper.Scout.Actions
 				requiredCommand = dte.Commands.Item(CopyToClipboardActionId, 0);
 			}
 			else if (toolWindowKind == ToolWindowGuids80.CallStack)
+			{
 				requiredCommand = dte.Commands.Item(SwitchToThisFrameActionId, 0);
+			}
 
 			return requiredCommand != null && requiredCommand.IsAvailable;
 		}
@@ -243,7 +262,7 @@ namespace ReSharper.Scout.Actions
 				if (methodAndParams.Length > 1)
 				{
 					builder.Append('(').Append(fixTypeName(methodAndParams[1]));
-					for (int i = 0x2; i < methodAndParams.Length; i++)
+					for (int i = 2; i < methodAndParams.Length; i++)
 					{
 						builder.Append(',').Append(fixTypeName(methodAndParams[i]));
 					}

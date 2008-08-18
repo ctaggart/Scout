@@ -153,7 +153,7 @@ namespace ReSharper.Scout
 				string value = getOption<string>(Settings.ReflectorPath, null);
 				if (string.IsNullOrEmpty(value))
 				{
-					string reflectorExecutableName = Properties.Settings.Default.Reflector + ".exe";
+					string reflectorExecutableName = Resources.Reflector + ".exe";
 
 					// Query the shell association key.
 					//

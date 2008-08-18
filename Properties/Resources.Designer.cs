@@ -88,6 +88,15 @@ namespace ReSharper.Scout.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reflector.
+        /// </summary>
+        internal static string Reflector {
+            get {
+                return ResourceManager.GetString("Reflector", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} of {1} bytes downloaded.
         /// </summary>
         internal static string Reflector_DownloadProgress {
@@ -115,11 +124,29 @@ namespace ReSharper.Scout.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to http://aisto.com/roeder/DotNet/.
+        /// </summary>
+        internal static string Reflector_HomePage {
+            get {
+                return ResourceManager.GetString("Reflector_HomePage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Uncompressing….
         /// </summary>
         internal static string Reflector_Uncompressing {
             get {
                 return ResourceManager.GetString("Reflector_Uncompressing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to http://www.aisto.com/roeder/dotnet/Download.aspx?File=Reflector&amp;Client=Reflector&amp;Version=4.0.0.0.
+        /// </summary>
+        internal static string Reflector_Url {
+            get {
+                return ResourceManager.GetString("Reflector_Url", resourceCulture);
             }
         }
         

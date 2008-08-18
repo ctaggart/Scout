@@ -69,9 +69,6 @@ namespace ReSharper.Scout.Actions
 		private ISymUnmanagedReader   _symbolReader;
 		private long                  _moduleCookie;
 		private readonly List<string> _parsedDocuments = new List<string>();
-#if RS40
-		private bool                  _gotSomeDocuments;
-#endif
 
 		private IAssembly assembly
 		{
@@ -147,19 +144,19 @@ namespace ReSharper.Scout.Actions
 
 					if (results.Count != 0)
 					{
-						string target = DeclaredElementPresenter.Format(_targetElement.Language,
-							DeclaredElementPresenter.KIND_NAME_PRESENTER, _targetElement);
-						Navigator.Navigate(true, _solution, PopupWindowContext.Empty.CreateLayouter(),
-							PopupWindowContext.Empty, results, target);
+						results = results.FindAll(delegate(INavigationResult result) { return result != null; });
+						if (results.Count != 0)
+						{
+							string target = DeclaredElementPresenter.Format(_targetElement.Language,
+								DeclaredElementPresenter.KIND_NAME_PRESENTER, _targetElement);
+							Navigator.Navigate(true, _solution, PopupWindowContext.Empty.CreateLayouter(),
+								PopupWindowContext.Empty, results, target);
+						}
+
 						succeeded = true;
 					}
-
 					else
-						succeeded = 
-#if RS40
-							_gotSomeDocuments ||
-#endif
-							executeAction(OpenWithReflectorAction.ActionId, context);
+						succeeded = executeAction(OpenWithReflectorAction.ActionId, context);
 				}
 
 				if (!succeeded)
@@ -177,9 +174,6 @@ namespace ReSharper.Scout.Actions
 			_symbolReader  = null;
 			_moduleCookie  = 0L;
 			_parsedDocuments.Clear();
-#if RS40
-			_gotSomeDocuments = false;
-#endif
 		}
 
 		private delegate bool ProcessSourceDelegate(List<INavigationResult> results, string document, int line, int column);
@@ -254,6 +248,13 @@ namespace ReSharper.Scout.Actions
 					return true;
 				}
 			}
+			else if (offset >= 0)
+			{
+				// We got a file, but failed to find the declaration
+
+				results.Add(null);
+				return true;
+			}
 
 			return false;
 		}
@@ -310,6 +311,13 @@ namespace ReSharper.Scout.Actions
 
 					results.Add(getNavigationResult(file, tn));
 				}
+			}
+			else if (offset >= 0)
+			{
+				// We got a file, but failed to find the declaration
+
+				results.Add(null);
+				return true;
 			}
 
 			return false;
@@ -580,8 +588,11 @@ namespace ReSharper.Scout.Actions
 			if (textControl == null)
 			{
 #if RS40
-				_gotSomeDocuments |= VSShell.Instance.ApplicationObject.ItemOperations.OpenFile(
-					sourceFilePath, EnvDTE.Constants.vsViewKindCode) != null;
+				if (VSShell.Instance.ApplicationObject.ItemOperations.OpenFile(
+					sourceFilePath, EnvDTE.Constants.vsViewKindCode) != null)
+				{
+					return 0;
+				}
 #endif
 				return -1;
 			}
@@ -590,13 +601,13 @@ namespace ReSharper.Scout.Actions
 			file = DocumentManager.GetInstance(_solution).GetProjectFile(document);
 
 			if (file == null)
-				return -1;
+				return 0;
 
 			PsiLanguageType languageType    = ProjectFileLanguageServiceManager.Instance.GetPsiLanguageType(file);
 			LanguageService languageService = LanguageServiceManager.Instance.GetLanguageService(languageType);
 
 			if (languageService == null)
-				return -1;
+				return 0;
 
 			ILexer  lexer  = languageService.CreateCachingLexer(document.Buffer);
 			IParser parser = languageService.CreateParser(lexer, _solution, null);

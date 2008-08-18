@@ -141,4 +141,13 @@
   <data name="ConfigFilesFilter" xml:space="preserve">
     <value>Configuration files (*.cfg)|*.exe|All Files|*</value>
   </data>
+  <data name="Reflector" xml:space="preserve">
+    <value>Reflector</value>
+  </data>
+  <data name="Reflector_HomePage" xml:space="preserve">
+    <value>http://aisto.com/roeder/DotNet/</value>
+  </data>
+  <data name="Reflector_Url" xml:space="preserve">
+    <value>http://www.aisto.com/roeder/dotnet/Download.aspx?File=Reflector&amp;Client=Reflector&amp;Version=4.0.0.0</value>
+  </data>
 </root>

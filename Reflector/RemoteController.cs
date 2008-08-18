@@ -1,14 +1,16 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+
 using JetBrains.ProjectModel;
 using JetBrains.Util;
-
 #if RS40
 using JetBrains.VSIntegration.Shell;
 #else
 using JetBrains.Shell.VSIntegration;
 #endif
+
+using ReSharper.Scout.Properties;
 
 namespace ReSharper.Scout.Reflector
 {
@@ -82,7 +84,7 @@ namespace ReSharper.Scout.Reflector
 
 		private static Process FindReflectorProcess()
 		{
-			string reflectorExecutableName = Properties.Settings.Default.Reflector + ".exe";
+			string reflectorExecutableName = Resources.Reflector + ".exe";
 
 			foreach (EnvDTE.Process process in VSShell.Instance.ApplicationObject.Debugger.LocalProcesses)
 			{
