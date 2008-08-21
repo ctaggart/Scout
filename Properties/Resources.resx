@@ -145,9 +145,9 @@
     <value>Reflector</value>
   </data>
   <data name="Reflector_HomePage" xml:space="preserve">
-    <value>http://aisto.com/roeder/DotNet/</value>
+    <value>http://www.red-gate.com/products/reflector/</value>
   </data>
   <data name="Reflector_Url" xml:space="preserve">
-    <value>http://www.aisto.com/roeder/dotnet/Download.aspx?File=Reflector&amp;Client=Reflector&amp;Version=4.0.0.0</value>
+    <value>http://downloads.red-gate.com/reflector.zip</value>
   </data>
 </root>

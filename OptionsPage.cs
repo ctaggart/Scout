@@ -296,9 +296,9 @@ namespace ReSharper.Scout
 			this._useReflectorCheckBox.AutoSize = true;
 			this._useReflectorCheckBox.Location = new System.Drawing.Point(17, 233);
 			this._useReflectorCheckBox.Name = "_useReflectorCheckBox";
-			this._useReflectorCheckBox.Size = new System.Drawing.Size(187, 17);
+			this._useReflectorCheckBox.Size = new System.Drawing.Size(168, 17);
 			this._useReflectorCheckBox.TabIndex = 9;
-			this._useReflectorCheckBox.Text = "Use Lutz Roeder\'s .NET &Reflector";
+			this._useReflectorCheckBox.Text = "Use Red Gate .NET &Reflector";
 			this._useReflectorCheckBox.UseVisualStyleBackColor = true;
 			this._useReflectorCheckBox.CheckedChanged += new System.EventHandler(this.handleReflectorGroupCheckedChanged);
 			this._useReflectorCheckBox.EnabledChanged += new System.EventHandler(this.handleReflectorGroupCheckedChanged);
