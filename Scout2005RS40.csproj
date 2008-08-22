@@ -1,15 +1,4 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{06D692A3-D1BC-4C85-A39D-2CCEBF4189C0}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ReSharper.Scout</RootNamespace>
-    <AssemblyName>Scout</AssemblyName>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug40|AnyCPU' ">
     <ReSharperVersion>40</ReSharperVersion>
     <DebugSymbols>true</DebugSymbols>
@@ -28,6 +17,32 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug41|AnyCPU' ">
+    <ReSharperVersion>41</ReSharperVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\bin\Debug$(ReSharperVersion)\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RS40</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release41|AnyCPU' ">
+    <ReSharperVersion>41</ReSharperVersion>
+    <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
+    <DefineConstants>TRACE;RS40</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>Scout</AssemblyName>
+    <RootNamespace>ReSharper.Scout</RootNamespace>
+    <OutputType>Library</OutputType>
+    <StartupObject>
+    </StartupObject>
+    <ProjectGuid>{06D692A3-D1BC-4C85-A39D-2CCEBF4189C0}</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

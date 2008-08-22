@@ -27,6 +27,6 @@ internal class AssemblyInfo
 	public const string Company      = "RSDN";
 	public const string Description  = "Navigation plugin for ReSharper";
 	public const string MajorVersion = "1.0";
-	public const string Version      = MajorVersion + ".12.0";
+	public const string Version      = MajorVersion + ".13.0";
 }
 

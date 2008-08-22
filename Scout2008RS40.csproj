@@ -1,22 +1,11 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{92FA431F-860C-498A-AC70-FED868E583D0}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ReSharper.Scout</RootNamespace>
-    <AssemblyName>Scout</AssemblyName>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <ProjectGuid>{92FA431F-860C-498A-AC70-FED868E583D0}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release40|AnyCPU' ">
+    <AssemblyName>Scout</AssemblyName>
+    <OutputType>Library</OutputType>
     <ReSharperVersion>40</ReSharperVersion>
     <RSPlatform>.Platform</RSPlatform>
     <RSPlatformReSharper>.Platform.ReSharper</RSPlatformReSharper>
@@ -28,6 +17,8 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug40|AnyCPU' ">
+    <AssemblyName>Scout</AssemblyName>
+    <OutputType>Library</OutputType>
     <ReSharperVersion>40</ReSharperVersion>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\bin\Debug$(ReSharperVersion)\</OutputPath>
@@ -36,6 +27,29 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <LangVersion>default</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug41|AnyCPU' ">
+    <AssemblyName>Scout</AssemblyName>
+    <OutputType>Library</OutputType>
+    <ReSharperVersion>41</ReSharperVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\bin\Debug$(ReSharperVersion)\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RS40</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>default</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release41|AnyCPU' ">
+    <AssemblyName>Scout</AssemblyName>
+    <OutputType>Library</OutputType>
+    <ReSharperVersion>41</ReSharperVersion>
+    <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
+    <DefineConstants>TRACE;RS40</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -173,8 +187,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
 </Project>
