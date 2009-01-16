@@ -3,12 +3,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-#if RS40
-using JetBrains.VSIntegration.Shell;
-#else
-using JetBrains.Shell.VSIntegration;
-#endif
-
 namespace ReSharper.Scout.DebugSymbols
 {
 	internal class SrcSrv
@@ -30,7 +24,7 @@ namespace ReSharper.Scout.DebugSymbols
 			// Initialize SrcSrv.dll
 			//
 			SrcSrvSetOptions(1);
-			SrcSrvSetParentWindow(VSShell.Instance.MainWindow.Handle);
+			SrcSrvSetParentWindow(ReSharper.VsShell.MainWindow.Handle);
 			SrcSrvInit(cookie, Options.SymbolCacheDir);
 		}
 
@@ -50,7 +44,14 @@ namespace ReSharper.Scout.DebugSymbols
 
 			IntPtr data;
 			uint dataByteCount;
-			sourceServerModule.GetSourceServerData(out dataByteCount, out data);
+
+			if (sourceServerModule.GetSourceServerData(out dataByteCount, out data) < 0)
+			{
+				// VS2005 fails on .pdb files produced by Phoenix compiler.
+				// https://connect.microsoft.com/Phoenix/
+				//
+				return 0L;
+			}
 
 			try
 			{

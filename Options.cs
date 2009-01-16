@@ -3,12 +3,6 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 
 using EnvDTE;
-#if RS40
-using JetBrains.VSIntegration.Shell;
-#else
-using System.IO;
-using JetBrains.Shell.VSIntegration;
-#endif
 
 namespace ReSharper.Scout
 {
@@ -49,7 +43,7 @@ namespace ReSharper.Scout
 			if (!UseDebuggerSettings)
 				return getOption(name, default(T));
 
-			using (RegistryKey key = Registry.CurrentUser.OpenSubKey(VSShell.Instance.GetVsRegistryKey("Debugger")))
+			using (RegistryKey key = Registry.CurrentUser.OpenSubKey(ReSharper.VsShell.GetVsRegistryKey("Debugger")))
 			{
 				object o = key == null? null: key.GetValue(name.ToString());
 				return (T)(o != null? Convert.ChangeType(o, typeof(T)): default(T));
@@ -62,11 +56,7 @@ namespace ReSharper.Scout
 			get
 			{
 				return getDebuggerOption<string>(Settings.SymbolCacheDir) ??
-#if RS40
-					VSShell.Instance.UserSettingsLocalDir.Combine("src").FullPath;
-#else
-					Path.Combine(VSShell.Instance.UserSettingsLocalDir, "src");
-#endif
+					ReSharper.GetUserSettingsFolder("src");
 			}
 		}
 
@@ -86,7 +76,7 @@ namespace ReSharper.Scout
 		#endregion
 
 		private static readonly string _myRegistryKeyPath = string.Join("\\",
-			new string[] { VSShell.Instance.ProductRegistryKey, "Plugins", AssemblyInfo.Product, AssemblyInfo.MajorVersion });
+			new string[] { ReSharper.VsShell.ProductRegistryKey, "Plugins", AssemblyInfo.Product, AssemblyInfo.MajorVersion });
 
 		private static T getOption<T>(Settings name, T defaultValue)
 		{
@@ -174,7 +164,7 @@ namespace ReSharper.Scout
 
 					// Search for a running instance.
 					//
-					foreach (Process process in VSShell.Instance.ApplicationObject.Debugger.LocalProcesses)
+					foreach (Process process in ReSharper.VsShell.ApplicationObject.Debugger.LocalProcesses)
 					{
 						if (process.Name.EndsWith(reflectorExecutableName, StringComparison.OrdinalIgnoreCase))
 							return ReflectorPath = process.Name;
@@ -182,7 +172,7 @@ namespace ReSharper.Scout
 
 					// Finally download it.
 					//
-					if (MessageBox.Show(VSShell.Instance.MainWindow, Resources.Options_ConfirmReflectorDownload,
+					if (MessageBox.Show(ReSharper.VsShell.MainWindow, Resources.Options_ConfirmReflectorDownload,
 						AssemblyInfo.Product, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 					{
 						return ReflectorPath = Reflector.Downloader.Instance.DownloadReflector();

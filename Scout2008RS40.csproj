@@ -2,6 +2,9 @@
   <PropertyGroup>
     <RootNamespace>ReSharper.Scout</RootNamespace>
     <ProjectGuid>{92FA431F-860C-498A-AC70-FED868E583D0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release40|AnyCPU' ">
     <AssemblyName>Scout</AssemblyName>
@@ -132,9 +135,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -143,6 +143,9 @@
   <ItemGroup>
     <Compile Include="Actions\OpenWithReflectorAction.cs" />
     <Compile Include="Actions\GotoDeclarationAction.cs" />
+    <Compile Include="Actions\OpenWithReflectorVSWindowsAction.cs" />
+    <Compile Include="Compatibility\RS40.cs" />
+    <Compile Include="DebugSymbols\ReferenceSource.cs" />
     <Compile Include="DebugSymbols\SymSrv.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -178,6 +181,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\VSWindowsActions.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,45 +1,28 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <AssemblyName>Scout</AssemblyName>
     <RootNamespace>ReSharper.Scout</RootNamespace>
+    <ProjectGuid>{49a9454b-67fc-46c7-9314-d14605b06f0b}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug45|AnyCPU' ">
+    <AssemblyName>Scout</AssemblyName>
     <OutputType>Library</OutputType>
-    <ProjectGuid>{295F17D5-A38E-4BE6-9757-0495A798919B}</ProjectGuid>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug30|AnyCPU' ">
-    <ReSharperVersion>30</ReSharperVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\bin\Debug$(ReSharperVersion)\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RS30</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>ISO-2</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release30|AnyCPU' ">
-    <ReSharperVersion>30</ReSharperVersion>
-    <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
-    <DefineConstants>TRACE;RS30</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release31|AnyCPU' ">
-    <ReSharperVersion>31</ReSharperVersion>
-    <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
-    <DefineConstants>TRACE;RS30</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug31|AnyCPU' ">
-    <ReSharperVersion>31</ReSharperVersion>
+    <ReSharperVersion>45</ReSharperVersion>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\bin\Debug$(ReSharperVersion)\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RS30</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;RS45</DefineConstants>
     <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>default</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release45|AnyCPU' ">
+    <AssemblyName>Scout</AssemblyName>
+    <OutputType>Library</OutputType>
+    <ReSharperVersion>45</ReSharperVersion>
+    <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
+    <DefineConstants>TRACE;RS45</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
@@ -48,53 +31,57 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\envdte.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.ActionManagement, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+    <Reference Include="JetBrains.Platform.ReSharper.ActionManagement, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ActionManagement.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.ActionManagement.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.ReSharper.DocumentManager, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+    <Reference Include="JetBrains.Platform.ReSharper.DocumentManager, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.DocumentManager.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.DocumentManager.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.ReSharper.DocumentModel, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+    <Reference Include="JetBrains.Platform.ReSharper.DocumentModel, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.DocumentModel.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.DocumentModel.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.Metadata, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+    <Reference Include="JetBrains.Platform.ReSharper.IDE, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Metadata.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.IDE.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.ReSharper.IDECore, Version=3.0.517.8, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="JetBrains.Platform.ReSharper.Metadata, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.IDECore.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.Metadata.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.ReSharper.ProjectModel, Version=3.0.517.8, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="JetBrains.Platform.ReSharper.ProjectModel, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.ProjectModel.dll</HintPath>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.ProjectModel.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.ReSharper.Psi, Version=3.0.517.8, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="JetBrains.Platform.ReSharper.Shell, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.UI, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.Util, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.VSIntegration, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.VSIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.TextControl, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Platform.ReSharper.TextControl.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.Feature.Services, Version=4.5.1141.11, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.Feature.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.Psi, Version=4.0.771.1, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.Psi.dll</HintPath>
-    </Reference>
-    <Reference Include="JetBrains.Shell, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Shell.dll</HintPath>
-    </Reference>
-    <Reference Include="JetBrains.ReSharper.TextControl, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.ReSharper.TextControl.dll</HintPath>
-    </Reference>
-    <Reference Include="JetBrains.UI, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="JetBrains.Util, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.Util.dll</HintPath>
-    </Reference>
-    <Reference Include="JetBrains.VSIntegration, Version=3.0.517.8, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib$(ReSharperVersion)\JetBrains.VSIntegration.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
@@ -120,22 +107,20 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.XML" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\GotoDeclarationAction.cs" />
-    <Compile Include="Actions\OpenWithReflectorAction.cs" />
-    <Compile Include="Actions\OpenWithReflectorVSWindowsAction.cs" />
-    <Compile Include="Compatibility\RS30.cs" />
-    <Compile Include="DebugSymbols\ReferenceSource.cs" />
+    <Compile Include="Compatibility\RS45CompatibleUITaskExecutor.cs" />
     <Compile Include="DebugSymbols\SymSrv.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Providers\ReflectorNavigationProvider.cs" />
     <Compile Include="Reflector\Downloader.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="OptionsPage.cs">
@@ -164,12 +149,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Actions.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\VSWindowsActions.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

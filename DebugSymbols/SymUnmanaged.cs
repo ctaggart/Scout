@@ -53,7 +53,8 @@ namespace ReSharper.Scout.DebugSymbols
 	]
 	internal interface ISymUnmanagedSourceServerModule
 	{
-		void GetSourceServerData(out uint dataByteCount, out IntPtr data);
+		[PreserveSig]
+		int GetSourceServerData(out uint dataByteCount, out IntPtr data);
 	};
 
 	[

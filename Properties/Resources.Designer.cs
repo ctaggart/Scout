@@ -87,6 +87,13 @@ namespace ReSharper.Scout.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap OptionsPageImage {
+            get {
+                object obj = ResourceManager.GetObject("OptionsPageImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Reflector.
         /// </summary>

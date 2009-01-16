@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<actions>
+
+	<insert group-id="VS#Reference Item" vsCommandBar="VS#Reference Item" position="last">
+		<separator/>
+		<action id="Scout.OpenWithReflectorVSWindows" text="Open with Reflector" />
+	</insert>
+
+	<insert group-id="VS#Call Stack Window" vsCommandBar="VS#Call Stack Window" position="last">
+		<separator/>
+		<action-ref id="Scout.OpenWithReflectorVSWindows" />
+	</insert>
+
+	<insert group-id="VS#Modules Window" vsCommandBar="VS#Modules Window" position="last">
+		<separator/>
+		<action-ref id="Scout.OpenWithReflectorVSWindows" />
+	</insert>
+
+	<insert group-id="VS#Object Browser Objects Pane" vsCommandBar="VS#Object Browser Objects Pane" position="last">
+		<action-ref id="Scout.OpenWithReflectorVSWindows"/>
+		<separator/>
+	</insert>
+
+	<insert group-id="VS#Object Browser Members Pane" vsCommandBar="VS#Object Browser Members Pane" position="last">
+		<action-ref id="Scout.OpenWithReflectorVSWindows"/>
+		<separator/>
+	</insert>
+
+</actions>
+

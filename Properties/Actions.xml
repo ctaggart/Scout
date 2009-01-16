@@ -16,30 +16,5 @@
 		<action id="Scout.GotoDeclarationInContextMenu" text="Go to Declaration" overrides="EditorContextMenus.CodeWindow.ReSharper_GotoDeclarationInContextMenu" />
 	</insert>
 
-	<insert group-id="VS#Reference Item" vsCommandBar="VS#Reference Item" position="last">
-		<separator/>
-		<action-ref id="Scout.OpenWithReflector" />
-	</insert>
-
-	<insert group-id="VS#Call Stack Window" vsCommandBar="VS#Call Stack Window" position="last">
-		<separator/>
-		<action-ref id="Scout.OpenWithReflector" />
-	</insert>
-
-	<insert group-id="VS#Modules Window" vsCommandBar="VS#Modules Window" position="last">
-		<separator/>
-		<action-ref id="Scout.OpenWithReflector" />
-	</insert>
-
-	<insert group-id="VS#Object Browser Objects Pane" vsCommandBar="VS#Object Browser Objects Pane" position="last">
-		<action-ref id="Scout.OpenWithReflector"/>
-		<separator/>
-	</insert>
-
-	<insert group-id="VS#Object Browser Members Pane" vsCommandBar="VS#Object Browser Members Pane" position="last">
-		<action-ref id="Scout.OpenWithReflector"/>
-		<separator/>
-	</insert>
-
 </actions>
 

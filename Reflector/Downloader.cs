@@ -5,14 +5,10 @@ using System;
 using System.IO;
 using System.Net;
 
-using JetBrains.UI.Shell.Progress;
-
-#if RS40
-using JetBrains.Application.Progress;
-using JetBrains.VSIntegration.Shell;
-#else
+#if RS30
 using JetBrains.Shell.Progress;
-using JetBrains.Shell.VSIntegration;
+#else
+using JetBrains.Application.Progress;
 #endif
 
 namespace ReSharper.Scout.Reflector
@@ -25,25 +21,19 @@ namespace ReSharper.Scout.Reflector
 
 		public string DownloadReflector()
 		{
-			using (SyncProgressWindow progressWindow = new SyncProgressWindow())
-			{
-				bool cancelled;
-
-				string path = (string)progressWindow.ExecuteTask(downloadTask,
-					Resources.Reflector_DownloadTask, out cancelled );
-
-				return cancelled ? null : path;
-			}
+			string path      = null;
+			bool   cancelled = ReSharper.ExecuteTask(Resources.Reflector_DownloadTask, true,
+				delegate(IProgressIndicator indicator)
+				{
+					path = (string)downloadTask(indicator);
+				});
+			return cancelled? null: path;
 		}
 
 		private static object downloadTask(IProgressIndicator progress)
 		{
 			string tempFilePath            = Path.GetTempFileName();
-#if RS40
-			string reflectorFolder         = VSShell.Instance.UserSettingsLocalDir.Combine(Resources.Reflector).FullPath;
-#else
-			string reflectorFolder         = Path.Combine(VSShell.Instance.UserSettingsLocalDir, Resources.Reflector);
-#endif
+			string reflectorFolder         = ReSharper.GetUserSettingsFolder(Resources.Reflector);
 			string reflectorExecutablePath = Path.Combine(reflectorFolder, Resources.Reflector + ".exe");
 
 			progress.Start(100);
@@ -103,7 +93,9 @@ namespace ReSharper.Scout.Reflector
 
 		public static void UncompressZipFile(string zipFile, string destFolder)
 		{
-			switch (VSShell.Instance.VsVersion.Major)
+			Version vsVersion = ReSharper.VsVersion;
+
+			switch (vsVersion.Major)
 			{
 				case 8:
 					uncompress8(zipFile, destFolder);
@@ -112,9 +104,8 @@ namespace ReSharper.Scout.Reflector
 					uncompress9(zipFile, destFolder);
 					break;
 				default:
-					throw new NotSupportedException(string.Format("VS version {0} is not supported", VSShell.Instance.VsVersion));
+					throw new NotSupportedException(string.Format("VS version {0} is not supported", vsVersion));
 			}
 		}
-
 	}
 }

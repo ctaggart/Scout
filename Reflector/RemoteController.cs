@@ -4,11 +4,6 @@ using System.Runtime.InteropServices;
 
 using JetBrains.ProjectModel;
 using JetBrains.Util;
-#if RS40
-using JetBrains.VSIntegration.Shell;
-#else
-using JetBrains.Shell.VSIntegration;
-#endif
 
 using ReSharper.Scout.Properties;
 
@@ -45,7 +40,7 @@ namespace ReSharper.Scout.Reflector
 
 				_reflectorProcess = null;
 				if (Options.ReuseAnyReflectorInstance)
-					_reflectorProcess = FindReflectorProcess();
+					_reflectorProcess = findReflectorProcess();
 
 				if (_reflectorProcess == null)
 				{
@@ -82,11 +77,11 @@ namespace ReSharper.Scout.Reflector
 			return sendCopyDataMessage("LoadAssembly\n" + fileName);
 		}
 
-		private static Process FindReflectorProcess()
+		private static Process findReflectorProcess()
 		{
 			string reflectorExecutableName = Resources.Reflector + ".exe";
 
-			foreach (EnvDTE.Process process in VSShell.Instance.ApplicationObject.Debugger.LocalProcesses)
+			foreach (EnvDTE.Process process in ReSharper.VsShell.ApplicationObject.Debugger.LocalProcesses)
 			{
 				if (process.Name.EndsWith(reflectorExecutableName, StringComparison.OrdinalIgnoreCase))
 					return Process.GetProcessById(process.ProcessID);

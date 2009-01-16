@@ -2,7 +2,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release31|AnyCPU' ">
     <ReSharperVersion>31</ReSharperVersion>
     <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
-    <DefineConstants>TRACE;RS31</DefineConstants>
+    <DefineConstants>TRACE;RS30</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,7 +21,7 @@
     <ReSharperVersion>31</ReSharperVersion>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\bin\Debug$(ReSharperVersion)\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RS31</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;RS30</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -125,6 +125,8 @@
   <ItemGroup>
     <Compile Include="Actions\GotoDeclarationAction.cs" />
     <Compile Include="Actions\OpenWithReflectorAction.cs" />
+    <Compile Include="Compatibility\RS30CompatibleUITaskExecutor.cs" />
+    <Compile Include="Compatibility\VsShell.cs" />
     <Compile Include="DebugSymbols\SrcSrv.cs" />
     <Compile Include="DebugSymbols\SymSrv.cs" />
     <Compile Include="DebugSymbols\SymUnmanaged.cs" />
