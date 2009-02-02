@@ -2,7 +2,11 @@
 using System.Resources;
 using System.Runtime.InteropServices;
 using JetBrains.ActionManagement;
+#if !RS45
 using JetBrains.UI.Shell.PluginSupport;
+#else
+using JetBrains.UI.Application.PluginSupport;
+#endif
 
 [assembly: AssemblyTitle(AssemblyInfo.Product)]
 [assembly: AssemblyProduct(AssemblyInfo.Product)]
@@ -24,7 +28,7 @@ using JetBrains.UI.Shell.PluginSupport;
 [assembly: PluginDescription(AssemblyInfo.Description)]
 [assembly: PluginVendor(AssemblyInfo.Company)]
 
-internal class AssemblyInfo
+internal static class AssemblyInfo
 {
 	public const string Product      = "Scout";
 	public const string Company      = "RSDN";
@@ -32,4 +36,3 @@ internal class AssemblyInfo
 	public const string MajorVersion = "1.1";
 	public const string Version      = MajorVersion + ".15.0";
 }
-

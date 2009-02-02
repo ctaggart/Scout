@@ -1,15 +1,15 @@
 using System;
 using JetBrains.Annotations;
+using JetBrains.Application.Progress;
 using JetBrains.IDE;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Navigation;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
-using JetBrains.UI.Shell.Progress;
-using JetBrains.Application.Progress;
+using JetBrains.UI.Application.Progress;
 using JetBrains.Util;
-using JetBrains.VSIntegration.Shell;
+using JetBrains.VSIntegration.Application;
 
 namespace ReSharper.Scout
 {
@@ -22,9 +22,9 @@ namespace ReSharper.Scout
 		}
 
 		[NotNull]
-		public static I GetVsService<S, I>() where I: class
+		public static TInterface GetVsService<TService, TInterface>() where TInterface: class
 		{
-			return VsShell.GetVsService<S, I>();
+			return VsShell.GetVsService<TService, TInterface>();
 		}
 
 		[CanBeNull]
