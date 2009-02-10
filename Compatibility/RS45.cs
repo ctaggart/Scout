@@ -41,9 +41,9 @@ namespace ReSharper.Scout
 			return VsShell.UserSettingsLocalDir.Combine(relativePath).FullPath;
 		}
 
-		public static uint GetToken(Pair<uint, uint> token)
+		public static uint GetToken(uint token)
 		{
-			return token.Second;
+			return token;
 		}
 
 		[CanBeNull]

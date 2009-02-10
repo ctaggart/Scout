@@ -125,8 +125,8 @@
   <ItemGroup>
     <Compile Include="Actions\GotoDeclarationAction.cs" />
     <Compile Include="Actions\OpenWithReflectorAction.cs" />
-    <Compile Include="Compatibility\RS30CompatibleUITaskExecutor.cs" />
-    <Compile Include="Compatibility\VsShell.cs" />
+    <Compile Include="Compatibility\RS30.cs" />
+    <Compile Include="DebugSymbols\ReferenceSource.cs" />
     <Compile Include="DebugSymbols\SrcSrv.cs" />
     <Compile Include="DebugSymbols\SymSrv.cs" />
     <Compile Include="DebugSymbols\SymUnmanaged.cs" />
