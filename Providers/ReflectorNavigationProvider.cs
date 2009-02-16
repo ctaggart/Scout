@@ -8,6 +8,7 @@ using JetBrains.ProjectModel.Build;
 using JetBrains.ReSharper.Feature.Services.Navigation;
 using JetBrains.ReSharper.Feature.Services.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.UI.RichText;
 using JetBrains.Util;
 using ReSharper.Scout.Properties;
 
@@ -67,13 +68,18 @@ namespace ReSharper.Scout.Providers
 				return Resources.OptionsPageImage;
 			}
 
-			public JetBrains.UI.RichText.RichText GetPresentationText()
+			public RichText GetPresentationText()
 			{
 				// TODO: "open 'foobar' with Reflector
 				//
 				return DeclaredElementPresenter.Format(
 					PresentationUtil.GetPresentationLanguage(_compiledElement),
 					DeclaredElementPresenter.QUALIFIED_NAME_PRESENTER, _compiledElement);
+			}
+
+			public RichText GetSecondaryPresentationText()
+			{
+				return RichText.Empty;
 			}
 
 			public bool Navigate(NavigationOptions options)
