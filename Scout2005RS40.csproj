@@ -133,6 +133,7 @@
   <ItemGroup>
     <Compile Include="Actions\GotoDeclarationAction.cs" />
     <Compile Include="Actions\OpenWithReflectorAction.cs" />
+    <Compile Include="Actions\OpenWithReflectorVSWindowsAction.cs" />
     <Compile Include="Compatibility\RS40.cs" />
     <Compile Include="DebugSymbols\ReferenceSource.cs" />
     <Compile Include="DebugSymbols\SrcSrv.cs" />

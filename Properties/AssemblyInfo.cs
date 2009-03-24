@@ -19,11 +19,7 @@ using JetBrains.UI.Application.PluginSupport;
 [assembly: Guid("e5a4cb55-1510-45e1-8961-7e614de1ffb4")]
 [assembly: ComVisible(false)]
 
-#if !RS45
 [assembly: ActionsXml("ReSharper.Scout.Properties.Actions.xml", Precompile=false)]
-#endif
-[assembly: ActionsXml("ReSharper.Scout.Properties.VSWindowsActions.xml", Precompile=false)]
-
 [assembly: PluginTitle(AssemblyInfo.Product)]
 [assembly: PluginDescription(AssemblyInfo.Description)]
 [assembly: PluginVendor(AssemblyInfo.Company)]

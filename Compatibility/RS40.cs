@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
+using JetBrains.ActionManagement;
 using JetBrains.IDE;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Navigation;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
+using JetBrains.UI.PopupWindowManager;
 using JetBrains.UI.Shell.Progress;
 using JetBrains.Application.Progress;
 using JetBrains.Util;
@@ -71,6 +74,27 @@ namespace ReSharper.Scout
 			
 			TextRange range = (node is IDeclaration)? ((IDeclaration)node).GetNameRange(): node.GetTreeTextRange();
 			return new TextControlNavigationResult(solution, projectFile, range, range.StartOffset);
+		}
+
+		public static IDisposable CreateLockCookie(ISolution solution)
+		{
+			return CommitCookie.Commit(solution);
+		}
+
+		public static void Navigate(ISolution solution, List<INavigationResult> results, string target)
+		{
+			Navigator.Navigate(true, solution, PopupWindowContext.Empty.CreateLayouter(),
+				PopupWindowContext.Empty, results, target);
+		}
+
+		public static void Navigate(IDeclaredElement element)
+		{
+			Navigator.Navigate(element, false, true);
+		}
+
+		public static DataConstant<IDeclaredElement> DECLARED_ELEMENT
+		{
+			get { return JetBrains.ReSharper.DataConstants.DECLARED_ELEMENT; }
 		}
 
 		public static VSShell VsShell

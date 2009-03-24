@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using JetBrains.ActionManagement;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.IDE;
@@ -8,6 +10,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.UI.Application.Progress;
+using JetBrains.UI.PopupWindowManager;
 using JetBrains.Util;
 using JetBrains.VSIntegration.Application;
 
@@ -61,6 +64,28 @@ namespace ReSharper.Scout
 
 			TextRange range = (node is IDeclaration)? ((IDeclaration)node).GetNameRange(): node.GetTreeTextRange();
 			return new ProjectFileNavigationPoint(new ProjectFileTextRange(projectFile, range));
+		}
+
+		[NotNull]
+		public static IDisposable CreateLockCookie([NotNull] ISolution solution)
+		{
+			return CommitCookie.Commit(solution);
+		}
+
+		public static void Navigate(ISolution solution, List<INavigationPoint> results, string target)
+		{
+			NavigationOptions options = NavigationOptions.FromWindowContext(PopupWindowContext.Empty, target, true);
+			NavigationManager.GetInstance(solution).Navigate(results, options);
+		}
+
+		public static void Navigate(IDeclaredElement element)
+		{
+			NavigationManager.Navigate(element, true);
+		}
+
+		public static DataConstant<IDeclaredElement> DECLARED_ELEMENT
+		{
+			get { return JetBrains.ReSharper.Psi.Services.DataConstants.DECLARED_ELEMENT; }
 		}
 
 		public static VSShell VsShell

@@ -5,6 +5,9 @@ using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Build;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
+#if !RS45
+using IPsiModule = JetBrains.ProjectModel.IModule;
+#endif
 
 namespace ReSharper.Scout.Actions
 {
@@ -43,7 +46,7 @@ namespace ReSharper.Scout.Actions
 			if (!Options.UseReflector)
 				return false;
 
-			IDeclaredElement element = context.GetData(JetBrains.ReSharper.DataConstants.DECLARED_ELEMENT);
+			IDeclaredElement element = context.GetData(ReSharper.DECLARED_ELEMENT);
 
 			return element != null && element.Module is IAssembly &&
 				element.Module.Name != null && !string.IsNullOrEmpty(element.XMLDocId);
@@ -51,7 +54,7 @@ namespace ReSharper.Scout.Actions
 
 		private static void execute(IDataContext context)
 		{
-			IDeclaredElement element = context.GetData(JetBrains.ReSharper.DataConstants.DECLARED_ELEMENT);
+			IDeclaredElement element = context.GetData(ReSharper.DECLARED_ELEMENT);
 
 			Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", element.XMLDocId);
 
@@ -59,7 +62,7 @@ namespace ReSharper.Scout.Actions
 			RemoteController.Instance.Select(element.XMLDocId);
 		}
 
-		private static void loadModule(IModule module)
+		private static void loadModule(IPsiModule module)
 		{
 			if (module == null) throw new ArgumentNullException("module");
 

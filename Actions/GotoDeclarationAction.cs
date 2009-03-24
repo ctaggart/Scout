@@ -1,9 +1,13 @@
 using System.Collections.Generic;
 using JetBrains.ActionManagement;
 using JetBrains.ProjectModel;
+#if RS45
+using JetBrains.ReSharper.Feature.Services.Navigation;
+#else
 using JetBrains.ReSharper.Navigation;
+using INavigationPoint = JetBrains.ReSharper.Navigation.INavigationResult;
+#endif
 using JetBrains.ReSharper.Psi;
-using JetBrains.UI.PopupWindowManager;
 using JetBrains.Util;
 
 namespace ReSharper.Scout.Actions
@@ -41,7 +45,7 @@ namespace ReSharper.Scout.Actions
 
 		private static bool isAvailable(IDataContext context)
 		{
-			IDeclaredElement element = context.GetData(JetBrains.ReSharper.DataConstants.DECLARED_ELEMENT);
+			IDeclaredElement element = context.GetData(ReSharper.DECLARED_ELEMENT);
 
 			if (element != null && element.Module != null &&
 				element.Module.Name != null && !string.IsNullOrEmpty(element.XMLDocId))
@@ -54,7 +58,7 @@ namespace ReSharper.Scout.Actions
 		private void execute(IDataContext context)
 		{
 			bool succeeded = false;
-			IDeclaredElement targetElement = context.GetData(JetBrains.ReSharper.DataConstants.DECLARED_ELEMENT);
+			IDeclaredElement targetElement = context.GetData(ReSharper.DECLARED_ELEMENT);
 
 			if (targetElement == null)
 				return;
@@ -63,12 +67,8 @@ namespace ReSharper.Scout.Actions
 
 			if (targetElement.Module is IAssembly)
 			{
-				List<INavigationResult> results;
-#if RS40
-				using (CommitCookie.Commit(solution))
-#else
-				using (JetBrains.Shell.ReadLockCookie.Create())
-#endif
+				List<INavigationPoint> results;
+				using (ReSharper.CreateLockCookie(solution))
 				{
 					Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", targetElement.XMLDocId);
 
@@ -78,14 +78,13 @@ namespace ReSharper.Scout.Actions
 				if (results.Count != 0)
 				{
 #if RS40
-					results = results.FindAll(delegate(INavigationResult result) { return result != null; });
+					results = results.FindAll(delegate(INavigationPoint result) { return result != null; });
 #endif
 					if (results.Count != 0)
 					{
 						string target = DeclaredElementPresenter.Format(targetElement.Language,
 							DeclaredElementPresenter.KIND_NAME_PRESENTER, targetElement);
-						Navigator.Navigate(true, solution, PopupWindowContext.Empty.CreateLayouter(),
-							PopupWindowContext.Empty, results, target);
+						ReSharper.Navigate(solution, results, target);
 					}
 
 					succeeded = true;
@@ -95,7 +94,7 @@ namespace ReSharper.Scout.Actions
 			}
 
 			if (!succeeded)
-				Navigator.Navigate(targetElement, false, true);
+				ReSharper.Navigate(targetElement);
 		}
 
 		private static bool executeAction(string actionId, IDataContext context)
