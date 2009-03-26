@@ -130,7 +130,10 @@
     <value>Uncompressing…</value>
   </data>
   <data name="Options_ConfirmReflectorDownload" xml:space="preserve">
-    <value>Do you want to download Reflector now?</value>
+    <value>Reflector executable is not found.
+
+Do you want to download Reflector now?
+Press `Cancel' button to choose the path manually.</value>
   </data>
   <data name="ExecutableFilesFilter" xml:space="preserve">
     <value>Executable files (*.exe)|*.exe|All Files|*</value>

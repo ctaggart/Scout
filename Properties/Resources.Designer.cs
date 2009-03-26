@@ -79,7 +79,10 @@ namespace ReSharper.Scout.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to download Reflector now?.
+        ///   Looks up a localized string similar to Reflector executable is not found.
+        ///
+        ///Do you want to download Reflector now?
+        ///Press `Cancel&apos; button to choose the path manually..
         /// </summary>
         internal static string Options_ConfirmReflectorDownload {
             get {

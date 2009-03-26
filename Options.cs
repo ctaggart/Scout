@@ -145,22 +145,9 @@ namespace ReSharper.Scout
 				{
 					string reflectorExecutableName = Resources.Reflector + ".exe";
 
-					// Query the shell association key.
-					//
-					using (RegistryKey dllFile = Registry.ClassesRoot.OpenSubKey("dllfile\\shell"))
-					{
-						if (dllFile != null)
-							foreach (string subKey in dllFile.GetSubKeyNames())
-								using (RegistryKey commandKey = dllFile.OpenSubKey(subKey + "\\command"))
-									if (commandKey != null)
-									{
-										string cmd = (string) commandKey.GetValue(null);
-										if (!string.IsNullOrEmpty(cmd))
-											foreach (string s in cmd.Split('"'))
-												if (s.EndsWith(reflectorExecutableName, StringComparison.OrdinalIgnoreCase))
-													return ReflectorPath = s;
-									}
-					}
+					value = SearchRegistry(reflectorExecutableName);
+					if (!string.IsNullOrEmpty(value))
+						return ReflectorPath = value;
 
 					// Search for a running instance.
 					//
@@ -187,7 +174,61 @@ namespace ReSharper.Scout
 			}
 		}
 
-		#endregion
+		private static string SearchRegistry(string executableName)
+		{
+			string[] pathOfInterest = new string[]
+			{
+				"code", // URL:Code Identifier Protocol
+				"reflectorfile",
+				"assembly",
+				"dllfile",
+				"exefile",
+				"Applications\\" + executableName
+			};
 
+			string value = null;
+			foreach (string path in pathOfInterest)
+			{
+				RegistryKey key = Registry.ClassesRoot.OpenSubKey(path)
+					?? Registry.CurrentUser.OpenSubKey(path);
+
+				if (key == null)
+					continue;
+
+				value = SerachRecursively(key, executableName);
+				key.Close();
+
+				if (value != null)
+					break;
+			}
+
+			return value;
+		}
+
+		private static string SerachRecursively(RegistryKey key, string executableName)
+		{
+			foreach (string subKeyName in key.GetSubKeyNames())
+			{
+				using (RegistryKey subKey = key.OpenSubKey(subKeyName))
+				{
+					if (subKey == null)
+						continue;
+
+					string cmd = (string)subKey.GetValue(null);
+					if (!string.IsNullOrEmpty(cmd))
+						foreach (string s in cmd.Split('"'))
+							if (s.EndsWith(executableName, StringComparison.OrdinalIgnoreCase))
+								return s;
+
+					string value = SerachRecursively(subKey, executableName);
+					if (value != null)
+						return value;
+				}
+			}
+
+			return null;
+		}
+
+		#endregion
 	}
 }
