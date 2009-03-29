@@ -437,7 +437,8 @@ namespace ReSharper.Scout.DebugSymbols
 					string sourceFileUrl = SrcSrv.Instance.GetFileUrl(sourceFilePath, _moduleCookie);
 					if (!string.IsNullOrEmpty(sourceFileUrl))
 					{
-						sourceFilePath = SymSrv.DownloadFile(sourceFileUrl, Options.SymbolCacheDir);
+						sourceFilePath = File.Exists(sourceFileUrl)? sourceFileUrl:
+							SymSrv.DownloadFile(sourceFileUrl, Options.SymbolCacheDir);
 					}
 				}
 			}
