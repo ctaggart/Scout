@@ -22,12 +22,12 @@ namespace ReSharper.Scout.Reflector
 		public string DownloadReflector()
 		{
 			string path      = null;
-			bool   cancelled = ReSharper.ExecuteTask(Resources.Reflector_DownloadTask, true,
+			bool   succeeded = ReSharper.ExecuteTask(Resources.Reflector_DownloadTask, true,
 				delegate(IProgressIndicator indicator)
 				{
 					path = (string)downloadTask(indicator);
 				});
-			return cancelled? null: path;
+			return succeeded? path: null;
 		}
 
 		private static object downloadTask(IProgressIndicator progress)

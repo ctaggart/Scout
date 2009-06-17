@@ -52,7 +52,7 @@ namespace ReSharper.Scout.DebugSymbols
 					if (!Directory.Exists(folderPath))
 						Directory.CreateDirectory(folderPath);
 
-					bool  cancelled = ReSharper.ExecuteTask(
+					bool  succeeded = ReSharper.ExecuteTask(
 						Path.GetFileName(cacheFileName), true,
 						delegate (IProgressIndicator progress)
 						{
@@ -74,7 +74,7 @@ namespace ReSharper.Scout.DebugSymbols
 							if (!progress.IsCanceled)
 								File.SetAttributes(cacheFileName, FileAttributes.ReadOnly);
 						});
-					return cancelled? null: cacheFileName;
+					return succeeded? cacheFileName: null;
 				}
 				else
 				{
