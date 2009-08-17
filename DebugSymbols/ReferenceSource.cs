@@ -20,10 +20,19 @@ using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.TextControl;
 #endif
 
-#if RS45
+#if RS45 || RS50
 using JetBrains.ReSharper.Feature.Services.Navigation;
 #else
 using INavigationPoint = JetBrains.ReSharper.Navigation.INavigationResult;
+#endif
+
+#if RS50
+using JetBrains.Metadata.Access.Fusion;
+using Constants = JetBrains.Metadata.Access.Fusion.Constants;
+using JetBrains.Util.dataStructures.TypedIntrinsics;
+#else
+using JetBrains.Metadata.Access;
+using Constants = JetBrains.Metadata.Access.Constants;
 #endif
 
 namespace ReSharper.Scout.DebugSymbols
@@ -57,7 +66,7 @@ namespace ReSharper.Scout.DebugSymbols
 				if (file.IsMissing)
 					continue;
 
-				_symbolReader = getSymbolReader(file.Location.FullPath);
+				_symbolReader = GetSymbolReader(file.Location.FullPath);
 
 				if (_symbolReader == null)
 					continue;
@@ -76,27 +85,27 @@ namespace ReSharper.Scout.DebugSymbols
 
 			// The fast way first.
 			//
-			processSources(getPreferredTokens(), results, optimisticProcess);
+			ProcessSources(GetPreferredTokens(), results, OptimisticProcess);
 
 			if (results.Count == 0 && _targetType != null)
 			{
 				List<uint> tokens = new List<uint>();
-				getAllTypeElementTokens(_targetType, tokens);
+				GetAllTypeElementTokens(_targetType, tokens);
 
 				// The slow but more reliable way.
 				//
-				processSources(tokens, results, pessimisticProcess);
+				ProcessSources(tokens, results, PessimisticProcess);
 			}
 
 			return results;
 		}
 
-		private static ISymUnmanagedReader getSymbolReader(string assemblyFilePath)
+		private static ISymUnmanagedReader GetSymbolReader(string assemblyFilePath)
 		{
 			IVsSmartOpenScope vsScope = ReSharper.GetVsService<SVsSmartOpenScope, IVsSmartOpenScope>();
 
-			Guid iid = JetBrains.Metadata.Access.Constants.IID_IMetaDataImport;
-			ISymUnmanagedBinder2 binder = (ISymUnmanagedBinder2) new JetBrains.Metadata.Access.CorSymBinder_SxSClass();
+			Guid iid = Constants.IID_IMetaDataImport;
+			ISymUnmanagedBinder2 binder = (ISymUnmanagedBinder2) new CorSymBinder_SxSClass();
 			object unkMetaDataImport;
 			int hr = vsScope.OpenScope(assemblyFilePath, 0, ref iid, out unkMetaDataImport);
 
@@ -106,17 +115,25 @@ namespace ReSharper.Scout.DebugSymbols
 				return null;
 			}
 
-			string symbolPath = string.Join("*", new string[]
-				{"srv", Options.SymbolCacheDir, Options.SymbolPath});
+            string cacheDir = Options.SymbolCacheDir;
+            ISymUnmanagedReader reader = null;
+            foreach (string path in Options.SymbolPath.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+		        string symbolPath = string.Join("*", new string[] {"srv", cacheDir, path});
 
-			ISymUnmanagedReader reader;
-			return binder.GetReaderForFile2(unkMetaDataImport,
-				assemblyFilePath, symbolPath, 0x0F, out reader) < 0? null: reader;
-		}
+                if (binder.GetReaderForFile2(unkMetaDataImport, assemblyFilePath,
+                    symbolPath, 0x0F, out reader) >= 0)
+                {
+                    break;
+                }
+            }
+
+		    return reader;
+        }
 
 		private delegate bool ProcessSourceDelegate(List<INavigationPoint> results, string document, int line, int column);
 
-		private void processSources(IEnumerable<uint> tokens, List<INavigationPoint> results, ProcessSourceDelegate callback)
+		private void ProcessSources(IEnumerable<uint> tokens, List<INavigationPoint> results, ProcessSourceDelegate callback)
 		{
 			StringBuilder sb = new StringBuilder(2048);
 			foreach (uint token in tokens)
@@ -161,17 +178,23 @@ namespace ReSharper.Scout.DebugSymbols
 			}
 		}
 
-		private bool optimisticProcess(List<INavigationPoint> results, string sourceFilePath, int line, int column)
+		private bool OptimisticProcess(List<INavigationPoint> results, string sourceFilePath, int line, int column)
 		{
 			IProjectFile file;
 			ITreeNode    rootNode;
-			int offset = loadFile(sourceFilePath, line, column, out file, out rootNode);
+			int offset = LoadFile(sourceFilePath, line, column, out file, out rootNode);
 
 			if (rootNode != null)
 			{
 				ITreeNode elementNode = rootNode.FindNextNode(delegate(ITreeNode n)
 				{
-					if (!n.GetTreeTextRange().Contains(offset))
+					if (!n.GetTreeTextRange().Contains(
+#if RS50
+                        new TreeOffset(offset)
+#else
+                        offset
+#endif
+                        ))
 						return TreeNodeActionType.IGNORE_SUBTREE;
 
 					if (n is ITypeMemberDeclaration && !(n is ITypeDeclaration))
@@ -198,7 +221,7 @@ namespace ReSharper.Scout.DebugSymbols
 			return false;
 		}
 
-		private bool pessimisticProcess(List<INavigationPoint> results, string sourceFilePath, int line, int column)
+		private bool PessimisticProcess(List<INavigationPoint> results, string sourceFilePath, int line, int column)
 		{
 			if (_parsedDocuments.Contains(sourceFilePath))
 				return false;
@@ -207,13 +230,19 @@ namespace ReSharper.Scout.DebugSymbols
 
 			IProjectFile file;
 			ITreeNode    rootNode;
-			int offset = loadFile(sourceFilePath, line, column, out file, out rootNode);
+			int offset = LoadFile(sourceFilePath, line, column, out file, out rootNode);
 
 			if (rootNode != null)
 			{
 				ITreeNode tn = rootNode.FindNextNode(delegate(ITreeNode n)
 				{
-					if (!n.GetTreeTextRange().Contains(offset))
+					if (!n.GetTreeTextRange().Contains(
+#if RS50
+                        new TreeOffset(offset)
+#else
+                        offset
+#endif
+                        ))
 						return TreeNodeActionType.IGNORE_SUBTREE;
 
 					if (n is ITypeDeclaration)
@@ -266,7 +295,7 @@ namespace ReSharper.Scout.DebugSymbols
 #if RS30
 
 		private WeakReference<AssemblyLoader2> _loader;
-		private IMetadataTypeInfo getMetaDataType(ITypeElement typeElm)
+		private IMetadataTypeInfo GetMetaDataType(ITypeElement typeElm)
 		{
 			if (typeElm == null)
 				return null;
@@ -286,9 +315,9 @@ namespace ReSharper.Scout.DebugSymbols
 			return asm == null? null: asm.GetTypeInfoFromQualifiedName(typeElm.CLRName, false);
 		}
 
-		private IEnumerable<uint> getPreferredTokens()
+		private IEnumerable<uint> GetPreferredTokens()
 		{
-			IMetadataTypeInfo typeInfo = getMetaDataType(_targetType);
+			IMetadataTypeInfo typeInfo = GetMetaDataType(_targetType);
 
 			if (typeInfo != null)
 			{
@@ -333,9 +362,9 @@ namespace ReSharper.Scout.DebugSymbols
 			}
 		}
 
-		private void getAllTypeElementTokens(ITypeElement typeElm, List<uint> tokens)
+		private void GetAllTypeElementTokens(ITypeElement typeElm, List<uint> tokens)
 		{
-			IMetadataTypeInfo typeInfo = getMetaDataType(typeElm);
+			IMetadataTypeInfo typeInfo = GetMetaDataType(typeElm);
 
 			if (typeInfo == null)
 				return;
@@ -344,7 +373,7 @@ namespace ReSharper.Scout.DebugSymbols
 				delegate(IMetadataMethod method) { return method.Token.Value; }));
 
 			foreach (ITypeElement nestedType in typeElm.NestedTypes)
-				getAllTypeElementTokens(nestedType, tokens);
+				GetAllTypeElementTokens(nestedType, tokens);
 		}
 
 		private static bool checkSignature(IParametersOwner po, IMetadataMethod mm)
@@ -370,7 +399,7 @@ namespace ReSharper.Scout.DebugSymbols
 		}
 #else
 
-		private IEnumerable<uint> getPreferredTokens()
+		private IEnumerable<uint> GetPreferredTokens()
 		{
 			if (_targetElement is IMetadataTokenOwner)
 			{
@@ -404,7 +433,7 @@ namespace ReSharper.Scout.DebugSymbols
 			}
 		}
 
-		private static void getAllTypeElementTokens(ITypeElement typeElm, List<uint> tokens)
+		private static void GetAllTypeElementTokens(ITypeElement typeElm, List<uint> tokens)
 		{
 			foreach (ITypeMember m in typeElm.GetMembers())
 			{
@@ -414,13 +443,13 @@ namespace ReSharper.Scout.DebugSymbols
 				// A nested type.
 				//
 				if (m is ITypeElement)
-					getAllTypeElementTokens((ITypeElement)m, tokens);
+					GetAllTypeElementTokens((ITypeElement)m, tokens);
 			}
 		}
 
 #endif
 
-		private string ensureSourceFile(string sourceFilePath)
+		private string EnsureSourceFile(string sourceFilePath)
 		{
 			// Download from the source server if enabled.
 			//
@@ -446,12 +475,12 @@ namespace ReSharper.Scout.DebugSymbols
 			return sourceFilePath;
 		}
 
-		private int loadFile(string sourceFilePath, int line, int column, out IProjectFile file, out ITreeNode rootNode)
+		private int LoadFile(string sourceFilePath, int line, int column, out IProjectFile file, out ITreeNode rootNode)
 		{
 			file     = null;
 			rootNode = null;
 
-			sourceFilePath = ensureSourceFile(sourceFilePath);
+			sourceFilePath = EnsureSourceFile(sourceFilePath);
 
 			if (!File.Exists(sourceFilePath))
 				return -1;
@@ -490,11 +519,20 @@ namespace ReSharper.Scout.DebugSymbols
 			ILexer  lexer  = languageService.CreateCachingLexer(document.Buffer);
 			IParser parser = languageService.CreateParser(lexer, _solution, null);
 
-			rootNode = parser.ParseFile().ToTreeNode();
+            // Convert line & row into a plain offset value.
+            //
+#if RS50
+			rootNode = parser.ParseFile(true).ToTreeNode();
+            TextControlLineColumn textcoords = new TextControlLineColumn(
+                (Int32<TextControlLine>)(line - 1),
+                (Int32<TextControlColumn>)(column - 1));
 
-			// Convert line & row into a plain offset value.
-			//
+		    return textControl.Coords.FromTextControlLineColumn(textcoords).ToDocOffset();
+#else
+			rootNode = parser.ParseFile().ToTreeNode();
 			return textControl.VisualToLogical(new VisualPosition(line - 1, column - 1)).Offset;
-		}
+#endif
+
+        }
 	}
 }

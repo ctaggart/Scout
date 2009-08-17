@@ -84,17 +84,17 @@ namespace ReSharper.Scout.Providers
 
 			public bool Navigate(NavigationOptions options)
 			{
-				loadModule(_compiledElement.Module);
+				LoadModule(_compiledElement.Module);
 				return RemoteController.Instance.Select(_compiledElement.XMLDocId);
 			}
 
-			private static void loadModule(IPsiModule module)
+			private static void LoadModule(IPsiModule module)
 			{
 				if (module == null) throw new ArgumentNullException("module");
 
 				if (module is IAssemblyPsiModule)
 				{
-					string asmFilePath = getAssemblyFile((IAssemblyPsiModule)module);
+					string asmFilePath = GetAssemblyFile((IAssemblyPsiModule)module);
 					if (asmFilePath != null)
 						RemoteController.Instance.LoadAssembly(asmFilePath);
 				}
@@ -116,7 +116,7 @@ namespace ReSharper.Scout.Providers
 				}
 			}
 
-			private static string getAssemblyFile(IAssemblyPsiModule assembly)
+			private static string GetAssemblyFile(IAssemblyPsiModule assembly)
 			{
 				if (assembly == null) throw new ArgumentNullException("assembly");
 

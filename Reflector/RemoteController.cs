@@ -22,13 +22,13 @@ namespace ReSharper.Scout.Reflector
 
 		public bool Available
 		{
-			get { return sendCopyDataMessage("Available\n4.0.0.0"); }
+			get { return SendCopyDataMessage("Available\n4.0.0.0"); }
 		}
 
 		public bool Select(string value)
 		{
 			Logger.LogMessage(LoggingLevel.VERBOSE, "Select {0}", value);
-			return sendCopyDataMessage("Select\n" + value);
+			return SendCopyDataMessage("Select\n" + value);
 		}
 
 		public bool LoadAssembly(string fileName)
@@ -40,7 +40,7 @@ namespace ReSharper.Scout.Reflector
 
 				_reflectorProcess = null;
 				if (Options.ReuseAnyReflectorInstance)
-					_reflectorProcess = findReflectorProcess();
+					_reflectorProcess = FindReflectorProcess();
 
 				if (_reflectorProcess == null)
 				{
@@ -74,14 +74,14 @@ namespace ReSharper.Scout.Reflector
 			}
 
 			Logger.LogMessage(LoggingLevel.VERBOSE, "LoadAssembly {0}", fileName);
-			return sendCopyDataMessage("LoadAssembly\n" + fileName);
+			return SendCopyDataMessage("LoadAssembly\n" + fileName);
 		}
 
-		private static Process findReflectorProcess()
+		private static Process FindReflectorProcess()
 		{
 			string reflectorExecutableName = Resources.Reflector + ".exe";
 
-			foreach (EnvDTE.Process process in ReSharper.VsShell.ApplicationObject.Debugger.LocalProcesses)
+			foreach (EnvDTE.Process process in ReSharper.Dte.Debugger.LocalProcesses)
 			{
 				if (process.Name.EndsWith(reflectorExecutableName, StringComparison.OrdinalIgnoreCase))
 					return Process.GetProcessById(process.ProcessID);
@@ -93,10 +93,10 @@ namespace ReSharper.Scout.Reflector
 		public bool UnloadAssembly(string fileName)
 		{
 			Logger.LogMessage(LoggingLevel.VERBOSE, "UnloadAssembly {0}", fileName);
-			return sendCopyDataMessage("UnloadAssembly\n" + fileName);
+			return SendCopyDataMessage("UnloadAssembly\n" + fileName);
 		}
 
-		private bool sendCopyDataMessage(string message)
+		private bool SendCopyDataMessage(string message)
 		{
 			if (_reflectorProcess == null || _reflectorProcess.HasExited)
 				return false;

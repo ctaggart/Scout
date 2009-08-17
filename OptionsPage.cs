@@ -24,10 +24,10 @@ namespace ReSharper.Scout
 		{
 			InitializeComponent();
 
-			setFontStyle(_usePdbFilesCheckBox,      FontStyle.Bold);
-			setFontStyle(_useReflectorCheckBox,     FontStyle.Bold);
-			setFontStyle(_reflectorConfigLabel,     FontStyle.Bold);
-			setFontStyle(_debuggerOptionsHintLabel, FontStyle.Italic);
+			SetFontStyle(_usePdbFilesCheckBox,      FontStyle.Bold);
+			SetFontStyle(_useReflectorCheckBox,     FontStyle.Bold);
+			SetFontStyle(_reflectorConfigLabel,     FontStyle.Bold);
+			SetFontStyle(_debuggerOptionsHintLabel, FontStyle.Italic);
 
 			_usePdbFilesCheckBox.Checked            = Options.UsePdbFiles;
 			_useDebuggerSettingsRadioButton.Checked = Options.UseDebuggerSettings;
@@ -59,7 +59,7 @@ namespace ReSharper.Scout
 			}
 		}
 
-		private static void setFontStyle(Control ctl, FontStyle style)
+		private static void SetFontStyle(Control ctl, FontStyle style)
 		{
 			ctl.Font = new Font(ctl.Font, style);
 		}

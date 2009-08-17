@@ -25,12 +25,12 @@ namespace ReSharper.Scout.Reflector
 			bool   succeeded = ReSharper.ExecuteTask(Resources.Reflector_DownloadTask, true,
 				delegate(IProgressIndicator indicator)
 				{
-					path = (string)downloadTask(indicator);
+					path = (string)DownloadTask(indicator);
 				});
 			return succeeded? path: null;
 		}
 
-		private static object downloadTask(IProgressIndicator progress)
+		private static object DownloadTask(IProgressIndicator progress)
 		{
 			string tempFilePath            = Path.GetTempFileName();
 			string reflectorFolder         = ReSharper.GetUserSettingsFolder(Resources.Reflector);
@@ -79,13 +79,13 @@ namespace ReSharper.Scout.Reflector
 			return null;
 		}
 
-		private static void uncompress8(string zipFile, string destFolder)
+		private static void Uncompress8(string zipFile, string destFolder)
 		{
 			new VS8::Microsoft.VisualStudio.Zip.ZipFileDecompressor(zipFile)
 				.UncompressToFolder(destFolder, true);
 		}
 
-		private static void uncompress9(string zipFile, string destFolder)
+		private static void Uncompress9(string zipFile, string destFolder)
 		{
 			new VS9::Microsoft.VisualStudio.Zip.ZipFileDecompressor(zipFile)
 				.UncompressToFolder(destFolder, true);
@@ -93,19 +93,16 @@ namespace ReSharper.Scout.Reflector
 
 		public static void UncompressZipFile(string zipFile, string destFolder)
 		{
-			Version vsVersion = ReSharper.VsVersion;
+		    Version vsVersion = ReSharper.VsVersion;
 
-			switch (vsVersion.Major)
-			{
-				case 8:
-					uncompress8(zipFile, destFolder);
-					break;
-				case 9:
-					uncompress9(zipFile, destFolder);
-					break;
-				default:
-					throw new NotSupportedException(string.Format("VS version {0} is not supported", vsVersion));
-			}
+		    if (vsVersion.Major < 9)
+		    {
+		        Uncompress8(zipFile, destFolder);
+		    }
+		    else
+            {
+		        Uncompress9(zipFile, destFolder);
+		    }
 		}
 	}
 }

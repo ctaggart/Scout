@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -38,10 +39,10 @@ namespace ReSharper.Scout
 
 		#region Source server settings
 
-		private static T getDebuggerOption<T>(Settings name)
+		private static T GetDebuggerOption<T>(Settings name)
 		{
 			if (!UseDebuggerSettings)
-				return getOption(name, default(T));
+				return GetOption(name, default(T));
 
 			using (RegistryKey key = Registry.CurrentUser.OpenSubKey(ReSharper.VsShell.GetVsRegistryKey("Debugger")))
 			{
@@ -52,25 +53,38 @@ namespace ReSharper.Scout
 
 		public static string SymbolCacheDir
 		{
-			set { setOption(Settings.SymbolCacheDir, value, null); }
+			set { SetOption(Settings.SymbolCacheDir, value, null); }
 			get
 			{
-				return getDebuggerOption<string>(Settings.SymbolCacheDir) ??
-					ReSharper.GetUserSettingsFolder("src");
+			    string cacheDir = GetDebuggerOption<string>(Settings.SymbolCacheDir) ??
+			               ReSharper.GetUserSettingsFolder("src");
+
+                if (cacheDir.Trim().Length == 0)
+                    cacheDir = Path.GetTempPath() + "\\Symbols";
+
+                if (!Directory.Exists(cacheDir))
+                    Directory.CreateDirectory(cacheDir);
+                else
+                {
+                    string pubSymbolsDir = cacheDir + "\\MicrosoftPublicSymbols";
+                    if (Directory.Exists(pubSymbolsDir))
+                        cacheDir = pubSymbolsDir;
+                }
+                return cacheDir;
 			}
 		}
 
 		public static string SymbolPath
 		{
-			set { setOption(Settings.SymbolPath, value, null); }
-			get { return getDebuggerOption<string>(Settings.SymbolPath)
+			set { SetOption(Settings.SymbolPath, value, null); }
+			get { return GetDebuggerOption<string>(Settings.SymbolPath)
 				?? Environment.GetEnvironmentVariable("_NT_SYMBOL_PATH"); }
 		}
 
 		public static bool UseDebuggerSettings
 		{
-			set { setOption(Settings.UseDebuggerSettings, value, true); }
-			get { return getOption(Settings.UseDebuggerSettings, true); }
+			set { SetOption(Settings.UseDebuggerSettings, value, true); }
+			get { return GetOption(Settings.UseDebuggerSettings, true); }
 		}
 
 		#endregion
@@ -78,7 +92,7 @@ namespace ReSharper.Scout
 		private static readonly string _myRegistryKeyPath = string.Join("\\",
 			new string[] { ReSharper.VsShell.ProductRegistryKey, "Plugins", AssemblyInfo.Product, AssemblyInfo.MajorVersion });
 
-		private static T getOption<T>(Settings name, T defaultValue)
+		private static T GetOption<T>(Settings name, T defaultValue)
 		{
 			using (RegistryKey key = Registry.CurrentUser.OpenSubKey(_myRegistryKeyPath))
 			{
@@ -89,7 +103,7 @@ namespace ReSharper.Scout
 			}
 		}
 
-		private static void setOption<T>(Settings name, T value, T defaultValue)
+		private static void SetOption<T>(Settings name, T value, T defaultValue)
 		{
 			using (RegistryKey key = Registry.CurrentUser.CreateSubKey(_myRegistryKeyPath))
 			{
@@ -105,53 +119,53 @@ namespace ReSharper.Scout
 
 		public static bool UsePdbFiles
 		{
-			set { setOption(Settings.UsePdbFiles, value, true); }
-			get { return getOption(Settings.UsePdbFiles, true); }
+			set { SetOption(Settings.UsePdbFiles, value, true); }
+			get { return GetOption(Settings.UsePdbFiles, true); }
 		}
 
 		public static bool UseReflector
 		{
-			set { setOption(Settings.UseReflector, value, true); }
-			get { return getOption(Settings.UseReflector, true); }
+			set { SetOption(Settings.UseReflector, value, true); }
+			get { return GetOption(Settings.UseReflector, true); }
 		}
 
 		#region Reflector settings
 
 		public static bool ReuseAnyReflectorInstance
 		{
-			set { setOption(Settings.ReuseAnyReflectorInstance, value, false); }
-			get { return getOption(Settings.ReuseAnyReflectorInstance, false); }
+			set { SetOption(Settings.ReuseAnyReflectorInstance, value, false); }
+			get { return GetOption(Settings.ReuseAnyReflectorInstance, false); }
 		}
 
 		public static ReflectorConfiguration ReflectorConfiguration
 		{
-			set { setOption(Settings.ReflectorConfiguration, value, ReflectorConfiguration.Default); }
-			get { return getOption(Settings.ReflectorConfiguration, ReflectorConfiguration.Default); }
+			set { SetOption(Settings.ReflectorConfiguration, value, ReflectorConfiguration.Default); }
+			get { return GetOption(Settings.ReflectorConfiguration, ReflectorConfiguration.Default); }
 		}
 
 		public static string ReflectorCustomConfiguration
 		{
-			set { setOption(Settings.ReflectorCustomConfiguration, value, null); }
-			get { return getOption<string>(Settings.ReflectorCustomConfiguration, null); }
+			set { SetOption(Settings.ReflectorCustomConfiguration, value, null); }
+			get { return GetOption<string>(Settings.ReflectorCustomConfiguration, null); }
 		}
 
 		public static string ReflectorPath
 		{
-			set { setOption(Settings.ReflectorPath, value, null); }
+			set { SetOption(Settings.ReflectorPath, value, null); }
 			get
 			{
-				string value = getOption<string>(Settings.ReflectorPath, null);
-				if (string.IsNullOrEmpty(value))
+				string value = GetOption<string>(Settings.ReflectorPath, null);
+				if (string.IsNullOrEmpty(value) || !File.Exists(value))
 				{
 					string reflectorExecutableName = Resources.Reflector + ".exe";
 
 					value = SearchRegistry(reflectorExecutableName);
-					if (!string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty(value) && File.Exists(value))
 						return ReflectorPath = value;
 
 					// Search for a running instance.
 					//
-					foreach (Process process in ReSharper.VsShell.ApplicationObject.Debugger.LocalProcesses)
+					foreach (Process process in ReSharper.Dte.Debugger.LocalProcesses)
 					{
 						if (process.Name.EndsWith(reflectorExecutableName, StringComparison.OrdinalIgnoreCase))
 							return ReflectorPath = process.Name;

@@ -2,7 +2,7 @@
 using System.Resources;
 using System.Runtime.InteropServices;
 using JetBrains.ActionManagement;
-#if !RS45
+#if !RS45 && !RS50
 using JetBrains.UI.Shell.PluginSupport;
 #else
 using JetBrains.UI.Application.PluginSupport;
@@ -30,5 +30,5 @@ internal static class AssemblyInfo
 	public const string Company      = "RSDN";
 	public const string Description  = "Navigation plugin for ReSharper";
 	public const string MajorVersion = "1.1";
-	public const string Version      = MajorVersion + ".17.0";
+	public const string Version      = MajorVersion + ".18.0";
 }

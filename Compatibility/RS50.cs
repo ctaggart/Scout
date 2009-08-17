@@ -12,8 +12,9 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.UI.Application.Progress;
 using JetBrains.UI.PopupWindowManager;
-using JetBrains.VSIntegration.Application;
-using TextRange=JetBrains.Util.TextRange;
+using JetBrains.Util;
+using JetBrains.VsIntegration.Application;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace ReSharper.Scout
 {
@@ -28,13 +29,13 @@ namespace ReSharper.Scout
         [NotNull]
         public static DTE Dte
         {
-            get { return VsShell.ApplicationObject; }
+            get { return GetVsService<SDTE, DTE>(); }
         }
 
         [NotNull]
 		public static TInterface GetVsService<TService, TInterface>() where TInterface: class
 		{
-			return VsShell.GetVsService<TService, TInterface>();
+			return VsShell.ServiceProvider.GetService<TService, TInterface>();
 		}
 
 		[CanBeNull]
@@ -43,7 +44,7 @@ namespace ReSharper.Scout
 			if (solution == null)
 				throw new ArgumentNullException("solution");
 
-			return EditorManager.GetInstance(solution).OpenFile(sourceFilePath, true, true);
+			return EditorManager.GetInstance(solution).OpenFile(sourceFilePath, true);
 		}
 
 		public static string GetUserSettingsFolder([NotNull] string relativePath)
@@ -69,8 +70,8 @@ namespace ReSharper.Scout
 			if (node == null)
 				throw new ArgumentNullException("node");
 
-			TextRange range = (node is IDeclaration)? ((IDeclaration)node).GetNameRange(): node.GetTreeTextRange();
-			return new ProjectFileNavigationPoint(new ProjectFileTextRange(projectFile, range));
+			TreeTextRange range = (node is IDeclaration)? ((IDeclaration)node).GetNameRange(): node.GetTreeTextRange();
+			return new ProjectFileNavigationPoint(new ProjectFileTextRange(projectFile, range.StartOffset.Offset));
 		}
 
 		[NotNull]

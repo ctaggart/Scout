@@ -5,7 +5,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Build;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
-#if !RS45
+#if !RS45 && !RS50
 using IPsiModule = JetBrains.ProjectModel.IModule;
 #endif
 
@@ -22,14 +22,14 @@ namespace ReSharper.Scout.Actions
 
 		public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
 		{
-			return isAvailable(context) || nextUpdate();
+			return IsAvailable(context) || nextUpdate();
 		}
 
 		public void Execute(IDataContext context, DelegateExecute nextExecute)
 		{
-			if (isAvailable(context))
+			if (IsAvailable(context))
 			{
-				execute(context);
+				Execute(context);
 			}
 			else
 			{
@@ -41,7 +41,7 @@ namespace ReSharper.Scout.Actions
 
 		#region Implementation
 
-		private static bool isAvailable(IDataContext context)
+		private static bool IsAvailable(IDataContext context)
 		{
 			if (!Options.UseReflector)
 				return false;
@@ -52,23 +52,25 @@ namespace ReSharper.Scout.Actions
 				element.Module.Name != null && !string.IsNullOrEmpty(element.XMLDocId);
 		}
 
-		private static void execute(IDataContext context)
+		private static void Execute(IDataContext context)
 		{
 			IDeclaredElement element = context.GetData(ReSharper.DECLARED_ELEMENT);
+            if (element == null)
+                return;
 
 			Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", element.XMLDocId);
 
-			loadModule(element.Module);
+			LoadModule(element.Module);
 			RemoteController.Instance.Select(element.XMLDocId);
 		}
 
-		private static void loadModule(IPsiModule module)
+		private static void LoadModule(IPsiModule module)
 		{
 			if (module == null) throw new ArgumentNullException("module");
 
 			if (module is IAssembly)
 			{
-				string asmFilePath = getAssemblyFile((IAssembly)module);
+				string asmFilePath = GetAssemblyFile((IAssembly)module);
 				if (asmFilePath != null)
 					RemoteController.Instance.LoadAssembly(asmFilePath);
 			}
@@ -90,7 +92,7 @@ namespace ReSharper.Scout.Actions
 			}
 		}
 
-		private static string getAssemblyFile(IAssembly assembly)
+		private static string GetAssemblyFile(IAssembly assembly)
 		{
 			if (assembly == null) throw new ArgumentNullException("assembly");
 

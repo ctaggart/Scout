@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using JetBrains.ActionManagement;
 using JetBrains.ProjectModel;
-#if RS45
+#if RS45 || RS50
 using JetBrains.ReSharper.Feature.Services.Navigation;
 #else
 using JetBrains.ReSharper.Navigation;
@@ -24,12 +24,12 @@ namespace ReSharper.Scout.Actions
 
 		public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
 		{
-			return isAvailable(context) || nextUpdate();
+			return IsAvailable(context) || nextUpdate();
 		}
 
 		public void Execute(IDataContext context, DelegateExecute nextExecute)
 		{
-			if (isAvailable(context))
+			if (IsAvailable(context))
 			{
 				execute(context);
 			}
@@ -43,7 +43,7 @@ namespace ReSharper.Scout.Actions
 
 		#region Implementation
 
-		private static bool isAvailable(IDataContext context)
+		private static bool IsAvailable(IDataContext context)
 		{
 			IDeclaredElement element = context.GetData(ReSharper.DECLARED_ELEMENT);
 
@@ -65,39 +65,43 @@ namespace ReSharper.Scout.Actions
 
 			ISolution solution = targetElement.GetManager().Solution;
 
+#if RS45 || RS50
+		    if (targetElement.Module is IAssemblyPsiModule)
+#else
 			if (targetElement.Module is IAssembly)
-			{
-				List<INavigationPoint> results;
-				using (ReSharper.CreateLockCookie(solution))
-				{
-					Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", targetElement.XMLDocId);
+#endif
+		        {
+		            List<INavigationPoint> results;
+		            using (ReSharper.CreateLockCookie(solution))
+		            {
+		                Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", targetElement.XMLDocId);
 
-					results = new ReferenceSource(targetElement).GetNavigationPoints();
-				}
+		                results = new ReferenceSource(targetElement).GetNavigationPoints();
+		            }
 
-				if (results.Count != 0)
-				{
+		            if (results.Count != 0)
+		            {
 #if RS40
 					results = results.FindAll(delegate(INavigationPoint result) { return result != null; });
 #endif
-					if (results.Count != 0)
-					{
-						string target = DeclaredElementPresenter.Format(targetElement.Language,
-							DeclaredElementPresenter.KIND_NAME_PRESENTER, targetElement);
-						ReSharper.Navigate(solution, results, target);
-					}
+		                if (results.Count != 0)
+		                {
+		                    string target = DeclaredElementPresenter.Format(targetElement.Language,
+		                                                                    DeclaredElementPresenter.KIND_NAME_PRESENTER, targetElement);
+		                    ReSharper.Navigate(solution, results, target);
+		                }
 
-					succeeded = true;
-				}
-				else
-					succeeded = executeAction(OpenWithReflectorAction.ActionId, context);
-			}
+		                succeeded = true;
+		            }
+		            else
+		                succeeded = ExecuteAction(OpenWithReflectorAction.ActionId, context);
+		        }
 
-			if (!succeeded)
+		    if (!succeeded)
 				ReSharper.Navigate(targetElement);
 		}
 
-		private static bool executeAction(string actionId, IDataContext context)
+		private static bool ExecuteAction(string actionId, IDataContext context)
 		{
 			IExecutableAction action = (IExecutableAction)ActionManager.Instance.GetAction(actionId);
 			bool available = action != null && action.Update(context);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using EnvDTE;
 using JetBrains.ActionManagement;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper;
@@ -13,7 +14,7 @@ using JetBrains.Shell.Progress;
 using JetBrains.Shell.VSIntegration;
 using JetBrains.UI.PopupWindowManager;
 using JetBrains.UI.Shell.Progress;
-using JetBrains.Util;
+using TextRange=JetBrains.Util.TextRange;
 
 namespace ReSharper.Scout
 {
@@ -44,7 +45,12 @@ namespace ReSharper.Scout
 			}
 		}
 
-		public static I GetVsService<S, I>() where I: class
+        public static DTE Dte
+        {
+            get { return VsShell.ApplicationObject; }
+        }
+
+        public static I GetVsService<S, I>() where I : class
 		{
 			I svc = (I)VsShell.GetService(typeof(S));
 

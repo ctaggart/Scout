@@ -20,7 +20,7 @@ namespace ReSharper.Scout.Actions
 	using Reflector;
 
 	[ActionHandler(ActionId)]
-	internal class OpenWithReflectorVSWindowsAction : IActionHandler
+	internal class OpenWithReflectorVsWindowsAction : IActionHandler
 	{
 		public const string ActionId = "Scout.OpenWithReflectorVSWindows";
 
@@ -31,14 +31,14 @@ namespace ReSharper.Scout.Actions
 
 		public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
 		{
-			return isAvailable(context) || nextUpdate();
+			return IsAvailable(context) || nextUpdate();
 		}
 
 		public void Execute(IDataContext context, DelegateExecute nextExecute)
 		{
-			if (isAvailable(context))
+			if (IsAvailable(context))
 			{
-				execute(context);
+				Execute(context);
 			}
 			else
 			{
@@ -50,7 +50,7 @@ namespace ReSharper.Scout.Actions
 
 		#region Implementation
 
-		private static bool isAvailable(IDataContext context)
+		private static bool IsAvailable(IDataContext context)
 		{
 			if (!Options.UseReflector)
 				return false;
@@ -59,7 +59,7 @@ namespace ReSharper.Scout.Actions
 			// DTE only related code.
 			//
 
-			_DTE dte = ReSharper.VsShell.ApplicationObject;
+            _DTE dte = ReSharper.Dte;
 			if (dte.ActiveWindow == null)
 				return false;
 
@@ -101,11 +101,11 @@ namespace ReSharper.Scout.Actions
 			return requiredCommand != null && requiredCommand.IsAvailable;
 		}
 
-		private static void execute(IDataContext context)
+		private static void Execute(IDataContext context)
 		{
 			// Check for call stack & modules
 			//
-			DTE dte = ReSharper.VsShell.ApplicationObject;
+			DTE dte = ReSharper.Dte;
 			if (dte.ActiveWindow != null)
 			{
 				string toolWindowKind = dte.ActiveWindow.ObjectKind;
@@ -113,32 +113,32 @@ namespace ReSharper.Scout.Actions
 				if (toolWindowKind == ToolWindowGuids80.SolutionExplorer)
 				{
 					IProjectModelElement project = context.GetData(ProjectModelDataConstants.PROJECT_MODEL_ELEMENT);
-					loadModuleByReference(project);
+					LoadModuleByReference(project);
 				}
 				else if (toolWindowKind == ToolWindowGuids80.ObjectBrowser)
-					loadFromObjectBrowserWindow();
+					LoadFromObjectBrowserWindow();
 				else if (toolWindowKind == ToolWindowGuids80.Modules)
-					loadFromModulesWindow(dte);
+					LoadFromModulesWindow(dte);
 				else if (toolWindowKind == ToolWindowGuids80.CallStack)
-					loadFromStackFrameWindow(dte);
+					LoadFromStackFrameWindow(dte);
 			}
 		}
 
-		private static void loadFromStackFrameWindow(_DTE dte)
+		private static void LoadFromStackFrameWindow(_DTE dte)
 		{
 			StackFrame savedStack = dte.Debugger.CurrentStackFrame;
 
-			if (runCommand(dte, SwitchToThisFrameActionId))
+			if (RunCommand(dte, SwitchToThisFrameActionId))
 			{
 				RemoteController.Instance.LoadAssembly(dte.Debugger.CurrentStackFrame.Module);
-				RemoteController.Instance.Select(stackFrameToXmlDoc(dte.Debugger.CurrentStackFrame));
+				RemoteController.Instance.Select(StackFrameToXmlDoc(dte.Debugger.CurrentStackFrame));
 				dte.Debugger.CurrentStackFrame = savedStack;
 			}
 		}
 
-		private static void loadFromModulesWindow(_DTE dte)
+		private static void LoadFromModulesWindow(_DTE dte)
 		{
-			if (runCommand(dte, CopyToClipboardActionId) && Clipboard.ContainsText())
+			if (RunCommand(dte, CopyToClipboardActionId) && Clipboard.ContainsText())
 			{
 				string[] lines = Clipboard.GetText().Split('\n');
 				foreach (string line in lines)
@@ -150,7 +150,7 @@ namespace ReSharper.Scout.Actions
 			}
 		}
 
-		private static void loadFromObjectBrowserWindow()
+		private static void LoadFromObjectBrowserWindow()
 		{
 			IVsNavigationTool vsNavigationTool = ReSharper.GetVsService<SVsObjBrowser, IVsNavigationTool>();
 			IVsSelectedSymbols ppIVsSelectedSymbols;
@@ -195,13 +195,13 @@ namespace ReSharper.Scout.Actions
 						break;
 
 					case _LIB_LISTTYPE.LLT_MEMBERS:
-						selectMember(@namespace, typeName, nodeName);
+						SelectMember(@namespace, typeName, nodeName);
 						break;
 				}
 			}
 		}
 
-		private static void selectMember(string @namespace, string typeName, string member)
+		private static void SelectMember(string @namespace, string typeName, string member)
 		{
 			// TODO: VB
 
@@ -231,10 +231,10 @@ namespace ReSharper.Scout.Actions
 
 				if (methodAndParams.Length > 1)
 				{
-					builder.Append('(').Append(fixTypeName(methodAndParams[1]));
+					builder.Append('(').Append(FixTypeName(methodAndParams[1]));
 					for (int i = 2; i < methodAndParams.Length; i++)
 					{
-						builder.Append(',').Append(fixTypeName(methodAndParams[i]));
+						builder.Append(',').Append(FixTypeName(methodAndParams[i]));
 					}
 					builder.Append(')');
 				}
@@ -251,7 +251,7 @@ namespace ReSharper.Scout.Actions
 			}
 		}
 
-		private static void loadModuleByReference(IProjectModelElement modelElement)
+		private static void LoadModuleByReference(IProjectModelElement modelElement)
 		{
 			if (modelElement is IModuleReference)
 			{
@@ -260,17 +260,17 @@ namespace ReSharper.Scout.Actions
 
 				// The assembly will be selected in the browser automatically 
 				//
-				loadModule(module);
+				LoadModule(module);
 			}
 		}
 
-		private static void loadModule(IModule module)
+		private static void LoadModule(IModule module)
 		{
 			if (module == null) throw new ArgumentNullException("module");
 
 			if (module is IAssembly)
 			{
-				string asmFilePath = getAssemblyFile((IAssembly)module);
+				string asmFilePath = GetAssemblyFile((IAssembly)module);
 				if (asmFilePath != null)
 					RemoteController.Instance.LoadAssembly(asmFilePath);
 			}
@@ -292,7 +292,7 @@ namespace ReSharper.Scout.Actions
 			}
 		}
 
-		private static string getAssemblyFile(IAssembly assembly)
+		private static string GetAssemblyFile(IAssembly assembly)
 		{
 			if (assembly == null) throw new ArgumentNullException("assembly");
 
@@ -305,7 +305,7 @@ namespace ReSharper.Scout.Actions
 			return null;
 		}
 
-		private static bool runCommand(_DTE dte, string command)
+		private static bool RunCommand(_DTE dte, string command)
 		{
 			Command cmd = dte.Commands.Item(command, 0);
 
@@ -320,7 +320,7 @@ namespace ReSharper.Scout.Actions
 			return false;
 		}
 
-		private static string stackFrameToXmlDoc(StackFrame frame)
+		private static string StackFrameToXmlDoc(StackFrame frame)
 		{
 			StringBuilder sb = new StringBuilder(64);
 
@@ -328,10 +328,10 @@ namespace ReSharper.Scout.Actions
 
 			if (frame.Arguments.Count != 0)
 			{
-				sb.Append('(').Append(fixTypeName(frame.Arguments.Item(1).Type));
+				sb.Append('(').Append(FixTypeName(frame.Arguments.Item(1).Type));
 
 				for (int i = 2; i <= frame.Arguments.Count; ++i)
-					sb.Append(',').Append(fixTypeName(frame.Arguments.Item(i).Type));
+					sb.Append(',').Append(FixTypeName(frame.Arguments.Item(i).Type));
 
 				sb.Append(')');
 			}
@@ -339,13 +339,13 @@ namespace ReSharper.Scout.Actions
 			return sb.ToString();
 		}
 
-		private static string fixTypeName(string type)
+		private static string FixTypeName(string type)
 		{
 			// TODO: generics && VB names
 
 			int arrIdx = type.IndexOf('[');
 			if (arrIdx > 0)
-				return fixTypeName(type.Substring(0, arrIdx)) + type.Substring(arrIdx);
+				return FixTypeName(type.Substring(0, arrIdx)) + type.Substring(arrIdx);
 
 			switch (type)
 			{
