@@ -2,23 +2,23 @@ using System;
 using System.Collections.Generic;
 using EnvDTE;
 using JetBrains.ActionManagement;
-using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.IDE;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Navigation;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.UI.Application.Progress;
 using JetBrains.UI.PopupWindowManager;
-using JetBrains.Util;
 using JetBrains.VsIntegration.Application;
 using Microsoft.VisualStudio.Shell.Interop;
+using JetBrains.Annotations;
 
 namespace ReSharper.Scout
 {
-	internal class ReSharper
+	internal static class ReSharper
 	{
 		public static bool ExecuteTask([NotNull] string name, bool cancelable, [NotNull] Action<IProgressIndicator> task)
 		{
@@ -106,6 +106,21 @@ namespace ReSharper.Scout
 		{
 			[NotNull]
 			get { return VsShell.VsVersion4; }
+		}
+
+		public static string GetDocId(IDeclaredElement element)
+		{
+			return element is IXmlDocIdOwner? ((IXmlDocIdOwner)element).XMLDocId: null;
+		}
+
+		public static IUpdatableAction GetAction(this ActionManager mgr, string actionId)
+		{
+			return mgr.GetUpdatableAction(actionId);
+		}
+
+		public static PsiLanguageType GetPsiLanguageType(this ProjectFileLanguageServiceManager mgr, IProjectFile file)
+		{
+			return mgr.GetPrimaryPsiLanguageType(file);
 		}
 	}
 }

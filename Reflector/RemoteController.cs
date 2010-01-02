@@ -20,9 +20,9 @@ namespace ReSharper.Scout.Reflector
 		//
 		private const long MaximumTimeout = 30000;
 
-		public bool Available
+		private bool IsReflectorRunning
 		{
-			get { return SendCopyDataMessage("Available\n4.0.0.0"); }
+			get { return _reflectorProcess != null && _reflectorProcess.Threads.Count > 0; }
 		}
 
 		public bool Select(string value)
@@ -33,44 +33,41 @@ namespace ReSharper.Scout.Reflector
 
 		public bool LoadAssembly(string fileName)
 		{
-			if (_reflectorProcess == null || _reflectorProcess.HasExited)
+			if (_reflectorProcess != null)
+				_reflectorProcess.Close();
+
+			_reflectorProcess = null;
+			if (Options.ReuseAnyReflectorInstance)
+				_reflectorProcess = FindReflectorProcess();
+
+			if (_reflectorProcess == null)
 			{
-				if (_reflectorProcess != null)
-					_reflectorProcess.Close();
+				string path = Options.ReflectorPath;
+				if (string.IsNullOrEmpty(path))
+					return false;
 
-				_reflectorProcess = null;
-				if (Options.ReuseAnyReflectorInstance)
-					_reflectorProcess = FindReflectorProcess();
+				string reflectorConfiguration = null;
 
-				if (_reflectorProcess == null)
+				if (!Options.ReuseAnyReflectorInstance)
 				{
-					string path = Options.ReflectorPath;
-					if (string.IsNullOrEmpty(path))
-						return false;
-
-					string reflectorConfiguration = null;
-
-					if (!Options.ReuseAnyReflectorInstance)
+					ReflectorConfiguration cfg = Options.ReflectorConfiguration;
+					if (cfg == ReflectorConfiguration.PerSolution)
 					{
-						ReflectorConfiguration cfg = Options.ReflectorConfiguration;
-						if (cfg == ReflectorConfiguration.PerSolution)
+						ISolution solution = SolutionManager.Instance.CurrentSolution;
+						if (solution != null)
 						{
-							ISolution solution = SolutionManager.Instance.CurrentSolution;
-							if (solution != null)
-							{
-								FileSystemPath solutionFile = solution.SolutionFilePath;
-								reflectorConfiguration = solutionFile.ChangeExtension(".reflector.cfg").FullPath;
-							}
+							FileSystemPath solutionFile = solution.SolutionFilePath;
+							reflectorConfiguration = solutionFile.ChangeExtension(".reflector.cfg").FullPath;
 						}
-						else if (cfg == ReflectorConfiguration.Custom)
-							reflectorConfiguration = Options.ReflectorCustomConfiguration;
 					}
-
-					if (!string.IsNullOrEmpty(reflectorConfiguration))
-						reflectorConfiguration = "\"/configuration:" + reflectorConfiguration + "\"";
-
-					_reflectorProcess = Process.Start(path, reflectorConfiguration);
+					else if (cfg == ReflectorConfiguration.Custom)
+						reflectorConfiguration = Options.ReflectorCustomConfiguration;
 				}
+
+				if (!string.IsNullOrEmpty(reflectorConfiguration))
+					reflectorConfiguration = "\"/configuration:" + reflectorConfiguration + "\"";
+
+				_reflectorProcess = Process.Start(path, reflectorConfiguration);
 			}
 
 			Logger.LogMessage(LoggingLevel.VERBOSE, "LoadAssembly {0}", fileName);
@@ -98,12 +95,14 @@ namespace ReSharper.Scout.Reflector
 
 		private bool SendCopyDataMessage(string message)
 		{
-			if (_reflectorProcess == null || _reflectorProcess.HasExited)
+			if (!IsReflectorRunning)
+			{
 				return false;
+			}
 
 			Stopwatch timeout = Stopwatch.StartNew();
 			IntPtr handle = _reflectorProcess.MainWindowHandle;
-			while (handle == IntPtr.Zero && !_reflectorProcess.HasExited && _reflectorProcess.Responding)
+			while (handle == IntPtr.Zero && IsReflectorRunning && _reflectorProcess.Responding)
 			{
 				if (timeout.ElapsedMilliseconds > MaximumTimeout)
 					return false;
@@ -123,7 +122,7 @@ namespace ReSharper.Scout.Reflector
 			char[] chars = message.ToCharArray();
 			CopyDataStruct data = new CopyDataStruct();
 			data.Padding = IntPtr.Zero;
-			data.Size = chars.Length * 2;
+			data.Size = chars.Length*2;
 			data.Buffer = Marshal.AllocHGlobal(data.Size);
 			Marshal.Copy(chars, 0, data.Buffer, chars.Length);
 			bool result = SendMessage(handle, WM_COPYDATA, IntPtr.Zero, ref data);

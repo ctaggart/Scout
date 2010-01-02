@@ -21,7 +21,7 @@ namespace ReSharper.Scout.Providers
 			Logger.Assert(element.IsValid(), "Target should be valid");
 			element.GetManager().AssertAllDocumentAreCommited();
 
-			if (!Options.UsePdbFiles || string.IsNullOrEmpty(element.XMLDocId)
+			if (!Options.UsePdbFiles || string.IsNullOrEmpty(ReSharper.GetDocId(element))
 				|| element.Module == null || element.Module.Name == null)
 			{
 				return basePoints;

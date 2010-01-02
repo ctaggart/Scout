@@ -43,12 +43,12 @@ namespace ReSharper.Scout
 			}
 		}
 
-        public static DTE Dte
-        {
-            get { return VsShell.ApplicationObject; }
-        }
+		public static DTE Dte
+		{
+			get { return VsShell.ApplicationObject; }
+		}
 
-        public static I GetVsService<S, I>() where I : class
+		public static I GetVsService<S, I>() where I : class
 		{
 			return VsShell.GetVsService<S, I>();
 		}
@@ -96,6 +96,11 @@ namespace ReSharper.Scout
 		public static void Navigate(IDeclaredElement element)
 		{
 			Navigator.Navigate(element, false, true);
+		}
+
+		public static string GetDocId(IDeclaredElement element)
+		{
+			return element == null? null: element.XMLDocId;
 		}
 
 		public static DataConstant<IDeclaredElement> DECLARED_ELEMENT

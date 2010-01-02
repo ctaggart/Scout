@@ -26,14 +26,8 @@ using JetBrains.ReSharper.Feature.Services.Navigation;
 using INavigationPoint = JetBrains.ReSharper.Navigation.INavigationResult;
 #endif
 
-#if RS50
-using JetBrains.Metadata.Access.Fusion;
-using Constants = JetBrains.Metadata.Access.Fusion.Constants;
-using JetBrains.Util.dataStructures.TypedIntrinsics;
-#else
 using JetBrains.Metadata.Access;
 using Constants = JetBrains.Metadata.Access.Constants;
-#endif
 
 namespace ReSharper.Scout.DebugSymbols
 {
@@ -517,22 +511,26 @@ namespace ReSharper.Scout.DebugSymbols
 				return 0;
 
 			ILexer  lexer  = languageService.CreateCachingLexer(document.Buffer);
-			IParser parser = languageService.CreateParser(lexer, _solution, null);
+			IParser parser = languageService.CreateParser(lexer, _solution, null
+#if RS50
+				, file
+#endif
+				);
 
-            // Convert line & row into a plain offset value.
-            //
+			// Convert line & row into a plain offset value.
+			//
 #if RS50
 			rootNode = parser.ParseFile(true).ToTreeNode();
-            TextControlLineColumn textcoords = new TextControlLineColumn(
-                (Int32<TextControlLine>)(line - 1),
-                (Int32<TextControlColumn>)(column - 1));
+			TextControlLineColumn textcoords = new TextControlLineColumn(
+				(Int32<TextControlLine>)(line - 1),
+				(Int32<TextControlColumn>)(column - 1));
 
-		    return textControl.Coords.FromTextControlLineColumn(textcoords).ToDocOffset();
+			return textControl.Coords.FromTextControlLineColumn(textcoords).ToDocOffset();
 #else
 			rootNode = parser.ParseFile().ToTreeNode();
 			return textControl.VisualToLogical(new VisualPosition(line - 1, column - 1)).Offset;
 #endif
 
-        }
+		}
 	}
 }

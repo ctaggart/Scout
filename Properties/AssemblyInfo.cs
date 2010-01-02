@@ -19,7 +19,11 @@ using JetBrains.UI.Application.PluginSupport;
 [assembly: Guid("e5a4cb55-1510-45e1-8961-7e614de1ffb4")]
 [assembly: ComVisible(false)]
 
-[assembly: ActionsXml("ReSharper.Scout.Properties.Actions.xml", Precompile=false)]
+#if RS50
+[assembly: ActionsXml("ReSharper.Scout.Properties.Actions50.xml")]
+#else
+[assembly: ActionsXml("ReSharper.Scout.Properties.Actions.xml", Precompile = false)]
+#endif
 [assembly: PluginTitle(AssemblyInfo.Product)]
 [assembly: PluginDescription(AssemblyInfo.Description)]
 [assembly: PluginVendor(AssemblyInfo.Company)]
@@ -30,5 +34,5 @@ internal static class AssemblyInfo
 	public const string Company      = "RSDN";
 	public const string Description  = "Navigation plugin for ReSharper";
 	public const string MajorVersion = "1.1";
-	public const string Version      = MajorVersion + ".18.0";
+	public const string Version      = MajorVersion + ".20.0";
 }

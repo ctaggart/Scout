@@ -15,7 +15,7 @@ namespace ReSharper.Scout.Actions
 	using DebugSymbols;
 
 	[ActionHandler(ActionId, ActionId + "InContextMenu")]
-	internal class GotoDeclarationAction : IActionHandler
+	internal class GotoDeclaration : IActionHandler
 	{
 		public const string OverridenActionId = "GotoDeclaration";
 		public const string ActionId = "Scout." + OverridenActionId;
@@ -48,11 +48,11 @@ namespace ReSharper.Scout.Actions
 			IDeclaredElement element = context.GetData(ReSharper.DECLARED_ELEMENT);
 
 			if (element != null && element.Module != null &&
-				element.Module.Name != null && !string.IsNullOrEmpty(element.XMLDocId))
+				element.Module.Name != null && !string.IsNullOrEmpty(ReSharper.GetDocId(element)))
 				return true;
 
 			IUpdatableAction action = ActionManager.Instance.GetAction(OverridenActionId);
-			return action != null && action.Update(context);
+			return action.Update(context);
 		}
 
 		private void execute(IDataContext context)
@@ -66,38 +66,38 @@ namespace ReSharper.Scout.Actions
 			ISolution solution = targetElement.GetManager().Solution;
 
 #if RS45 || RS50
-		    if (targetElement.Module is IAssemblyPsiModule)
+			if (targetElement.Module is IAssemblyPsiModule)
 #else
 			if (targetElement.Module is IAssembly)
 #endif
-		        {
-		            List<INavigationPoint> results;
-		            using (ReSharper.CreateLockCookie(solution))
-		            {
-		                Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", targetElement.XMLDocId);
+				{
+					List<INavigationPoint> results;
+					using (ReSharper.CreateLockCookie(solution))
+					{
+						Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", ReSharper.GetDocId(targetElement));
 
-		                results = new ReferenceSource(targetElement).GetNavigationPoints();
-		            }
+						results = new ReferenceSource(targetElement).GetNavigationPoints();
+					}
 
-		            if (results.Count != 0)
-		            {
+					if (results.Count != 0)
+					{
 #if RS40
 					results = results.FindAll(delegate(INavigationPoint result) { return result != null; });
 #endif
-		                if (results.Count != 0)
-		                {
-		                    string target = DeclaredElementPresenter.Format(targetElement.Language,
-		                                                                    DeclaredElementPresenter.KIND_NAME_PRESENTER, targetElement);
-		                    ReSharper.Navigate(solution, results, target);
-		                }
+						if (results.Count != 0)
+						{
+							string target = DeclaredElementPresenter.Format(targetElement.Language,
+								DeclaredElementPresenter.KIND_NAME_PRESENTER, targetElement);
+							ReSharper.Navigate(solution, results, target);
+						}
 
-		                succeeded = true;
-		            }
-		            else
-		                succeeded = ExecuteAction(OpenWithReflectorAction.ActionId, context);
-		        }
+						succeeded = true;
+					}
+					else
+						succeeded = ExecuteAction(OpenWithReflector.ActionId, context);
+				}
 
-		    if (!succeeded)
+			if (!succeeded)
 				ReSharper.Navigate(targetElement);
 		}
 

@@ -90,6 +90,11 @@ namespace ReSharper.Scout
 			NavigationManager.Navigate(element, true);
 		}
 
+		public static string GetDocId(IDeclaredElement element)
+		{
+			return element == null? null: element.XMLDocId;
+		}
+
 		public static DataConstant<IDeclaredElement> DECLARED_ELEMENT
 		{
 			get { return JetBrains.ReSharper.Psi.Services.DataConstants.DECLARED_ELEMENT; }

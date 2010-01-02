@@ -4,7 +4,9 @@ using System.Drawing;
 using JetBrains.Application;
 using JetBrains.ComponentModel;
 using JetBrains.ProjectModel;
+#if !RS50
 using JetBrains.ProjectModel.Build;
+#endif
 using JetBrains.ReSharper.Feature.Services.Navigation;
 using JetBrains.ReSharper.Feature.Services.Util;
 using JetBrains.ReSharper.Psi;
@@ -28,7 +30,7 @@ namespace ReSharper.Scout.Providers
 			Logger.Assert(element.IsValid(), "Target should be valid");
 			element.GetManager().AssertAllDocumentAreCommited();
 
-			if (Options.UseReflector && !string.IsNullOrEmpty(element.XMLDocId) &&
+			if (Options.UseReflector && !string.IsNullOrEmpty(ReSharper.GetDocId(element)) &&
 				element.Module != null && element.Module.Name != null)
 			{
 				List<INavigationPoint> points = new List<INavigationPoint>();
@@ -85,7 +87,7 @@ namespace ReSharper.Scout.Providers
 			public bool Navigate(NavigationOptions options)
 			{
 				LoadModule(_compiledElement.Module);
-				return RemoteController.Instance.Select(_compiledElement.XMLDocId);
+				return RemoteController.Instance.Select(ReSharper.GetDocId(_compiledElement));
 			}
 
 			private static void LoadModule(IPsiModule module)

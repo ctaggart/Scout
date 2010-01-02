@@ -2,7 +2,9 @@ using System;
 
 using JetBrains.ActionManagement;
 using JetBrains.ProjectModel;
+#if !RS50
 using JetBrains.ProjectModel.Build;
+#endif
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 #if !RS45 && !RS50
@@ -14,9 +16,9 @@ namespace ReSharper.Scout.Actions
 	using Reflector;
 
 	[ActionHandler(ActionId)]
-	internal class OpenWithReflectorAction : IActionHandler
+	internal class OpenWithReflector : IActionHandler
 	{
-		public const string ActionId = "Scout.OpenWithReflector";
+		public const string ActionId = "OpenWithReflector";
 
 		#region IActionHandler Members
 
@@ -49,19 +51,19 @@ namespace ReSharper.Scout.Actions
 			IDeclaredElement element = context.GetData(ReSharper.DECLARED_ELEMENT);
 
 			return element != null && element.Module is IAssembly &&
-				element.Module.Name != null && !string.IsNullOrEmpty(element.XMLDocId);
+				element.Module.Name != null && !string.IsNullOrEmpty(ReSharper.GetDocId(element));
 		}
 
 		private static void Execute(IDataContext context)
 		{
 			IDeclaredElement element = context.GetData(ReSharper.DECLARED_ELEMENT);
-            if (element == null)
-                return;
+			if (element == null)
+				return;
 
-			Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", element.XMLDocId);
+			Logger.LogMessage(LoggingLevel.VERBOSE, "Navigate to '{0}'", ReSharper.GetDocId(element));
 
 			LoadModule(element.Module);
-			RemoteController.Instance.Select(element.XMLDocId);
+			RemoteController.Instance.Select(ReSharper.GetDocId(element));
 		}
 
 		private static void LoadModule(IPsiModule module)

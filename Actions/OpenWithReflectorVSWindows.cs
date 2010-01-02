@@ -7,8 +7,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 using JetBrains.ActionManagement;
 using JetBrains.ProjectModel;
+#if !RS50
 using JetBrains.ProjectModel.Build;
-
+#endif
 #if RS30
 using ProjectModelDataConstants=JetBrains.ReSharper.DataConstants;
 #else
@@ -20,9 +21,9 @@ namespace ReSharper.Scout.Actions
 	using Reflector;
 
 	[ActionHandler(ActionId)]
-	internal class OpenWithReflectorVsWindowsAction : IActionHandler
+	internal class OpenWithReflectorVsWindows : IActionHandler
 	{
-		public const string ActionId = "Scout.OpenWithReflectorVSWindows";
+		public const string ActionId = "OpenWithReflectorVsWindows";
 
 		public const string SwitchToThisFrameActionId = "DebuggerContextMenus.CallStackWindow.SwitchToFrame";
 		public const string CopyToClipboardActionId   = "Edit.Copy";
@@ -59,7 +60,7 @@ namespace ReSharper.Scout.Actions
 			// DTE only related code.
 			//
 
-            _DTE dte = ReSharper.Dte;
+			_DTE dte = ReSharper.Dte;
 			if (dte.ActiveWindow == null)
 				return false;
 

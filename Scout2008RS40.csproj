@@ -141,9 +141,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\OpenWithReflectorAction.cs" />
-    <Compile Include="Actions\GotoDeclarationAction.cs" />
-    <Compile Include="Actions\OpenWithReflectorVSWindowsAction.cs" />
+    <Compile Include="Actions\GotoDeclaration.cs" />
+    <Compile Include="Actions\OpenWithReflector.cs" />
+    <Compile Include="Actions\OpenWithReflectorVSWindows.cs" />
     <Compile Include="Compatibility\RS40.cs" />
     <Compile Include="DebugSymbols\ReferenceSource.cs" />
     <Compile Include="DebugSymbols\SymSrv.cs" />
