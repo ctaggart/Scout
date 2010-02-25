@@ -71,7 +71,7 @@ namespace ReSharper.Scout
 				throw new ArgumentNullException("node");
 
 			TreeTextRange range = (node is IDeclaration)? ((IDeclaration)node).GetNameRange(): node.GetTreeTextRange();
-			return new ProjectFileNavigationPoint(new ProjectFileTextRange(projectFile, range.StartOffset.Offset));
+			return new TextNavigationPoint(new ProjectFileTextRange(projectFile, range.StartOffset.Offset));
 		}
 
 		[NotNull]
