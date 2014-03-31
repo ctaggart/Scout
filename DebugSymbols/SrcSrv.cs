@@ -5,13 +5,13 @@ using System.Text;
 
 namespace ReSharper.Scout.DebugSymbols
 {
-    internal class SrcSrv
+    public class SrcSrv
     {
-        public static readonly SrcSrv Instance = new SrcSrv();
+        //public static readonly SrcSrv Instance = new SrcSrv();
 
         private readonly IntPtr _cookie;
 
-        public SrcSrv(): this(System.Diagnostics.Process.GetCurrentProcess().Handle)
+        public SrcSrv()//: this(System.Diagnostics.Process.GetCurrentProcess().Handle)
         {
         }
 

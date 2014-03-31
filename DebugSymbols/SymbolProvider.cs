@@ -142,7 +142,7 @@ namespace Microsoft.Samples.SimplePDBReader
         /// </summary>
         /// <param name="modulePath">Full path to the module of interest</param>
         /// <returns>A symbol reader for the specified module or null if none could be found</returns>
-        private ISymUnmanagedReader GetSymbolReaderForFile(string modulePath)
+        public ISymUnmanagedReader GetSymbolReaderForFile(string modulePath)
         {
             ISymUnmanagedReader reader;
             lock (m_symReaders)
@@ -276,7 +276,7 @@ namespace Microsoft.Samples.SimplePDBReader
         }
 
         [ComImport, Guid("B4CE6286-2A6B-3712-A3B7-1EE1DAD467B5"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        private interface ISymUnmanagedReader
+        public interface ISymUnmanagedReader
         {
             ISymUnmanagedDocument GetDocument([MarshalAs(UnmanagedType.LPWStr)] String url,
                                   Guid language,
@@ -346,6 +346,8 @@ namespace Microsoft.Samples.SimplePDBReader
                                           out Boolean pbCurrent);
 
             int GetMethodVersion(ISymUnmanagedMethod pMethod);
+
+            void GetDocuments();
         };
 
         [ComImport, Guid("969708D2-05E5-4861-A3B0-96E473CDF63F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -355,7 +357,7 @@ namespace Microsoft.Samples.SimplePDBReader
         }
 
         [ComImport, Guid("40DE4037-7C81-3E1E-B022-AE1ABFF2CA08"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        private interface ISymUnmanagedDocument
+        public interface ISymUnmanagedDocument
         {
             void GetURL(int cchUrl,
                            out int pcchUrl,
@@ -391,7 +393,7 @@ namespace Microsoft.Samples.SimplePDBReader
         };
 
         [ComImport, Guid("B62B923C-B500-3158-A543-24F307A8B7E1"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        private interface ISymUnmanagedMethod
+        public interface ISymUnmanagedMethod
         {
             SymbolToken GetToken();
             int GetSequencePointCount();
@@ -425,7 +427,7 @@ namespace Microsoft.Samples.SimplePDBReader
         }
 
         [ComImport, Guid("68005D0F-B8E0-3B01-84D5-A11A94154942"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        private interface ISymUnmanagedScope
+        public interface ISymUnmanagedScope
         {
             ISymUnmanagedMethod GetMethod();
 
@@ -451,7 +453,7 @@ namespace Microsoft.Samples.SimplePDBReader
         };
 
         [ComImport, Guid("9F60EEBE-2D9A-3F7C-BF58-80BC991C60BB"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        private interface ISymUnmanagedVariable
+        public interface ISymUnmanagedVariable
         {
             void GetName(int cchName,
                             out int pcchName,
@@ -477,7 +479,7 @@ namespace Microsoft.Samples.SimplePDBReader
         }
 
         [ComImport, Guid("0DFF7289-54F8-11d3-BD28-0000F80849BD"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        private interface ISymUnmanagedNamespace
+        public interface ISymUnmanagedNamespace
         {
             void GetName(int cchName,
                             out int pcchName,

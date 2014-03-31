@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace ReSharper.Scout.DebugSymbols
 {
-    internal static class SymSrv
+    public static class SymSrv
     {
         public static string DownloadFile(string url, string fileStorePath)
         {
@@ -63,6 +63,18 @@ namespace ReSharper.Scout.DebugSymbols
                     //            File.SetAttributes(cacheFileName, FileAttributes.ReadOnly);
                     //    });
                     //return succeeded? cacheFileName: null;
+
+                    using (Stream fileStream = File.OpenWrite(cacheFileName))
+                    {
+                        byte[] buffer = new byte[8192];
+                        uint read;
+                        while (httpReadFile(fileHandle, buffer, (uint)buffer.Length, out read) && read > 0)
+                        {
+                            fileStream.Write(buffer, 0, (int)read);
+                        }
+                    }
+
+
                 }
                 else
                 {
