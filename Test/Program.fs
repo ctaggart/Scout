@@ -7,6 +7,8 @@ open Microsoft.Samples.SimplePDBReader
 open System.Text
 open ReSharper.Scout.DebugSymbols
 open IKVM.Reflection
+open System.IO
+open System.Reflection
 
 //let symInit() =
 //    let hProcess = new IntPtr(Random().Next())
@@ -18,6 +20,8 @@ open IKVM.Reflection
 //module Windows =
 //    [<DllImport("kernel32", CharSet=CharSet.Unicode)>]
 //    extern int AddDllDirectory(string dir)
+
+// from C:\Projects\FSharp.Compiler.Service\src\absil\ilsupp.fs
 
 [<ComImport; Interface>]
 [<Guid("809c652e-7396-11d2-9771-00a0c9b4d50c") ; InterfaceType(ComInterfaceType.InterfaceIsIUnknown)>]
@@ -114,35 +118,47 @@ let printUrlAndDownload() =
     let b = SymSrv.DownloadFile(url, @"C:\temp")
     ()
 
-let printAssemblyInfo() =
-    // http://weblog.ikvm.net/PermaLink.aspx?guid=d28a08bf-0476-41be-a923-60842fdaf8b0
-    let all =
-        BindingFlags.Public 
-        ||| BindingFlags.NonPublic
-        ||| BindingFlags.Instance
-        ||| BindingFlags.Static
-        ||| BindingFlags.DeclaredOnly
-    use universe = new Universe()
-    universe.add_AssemblyResolve(
-        ResolveEventHandler(fun _ args ->
-            universe.CreateMissingAssembly args.Name))
-    let writeMembers (members:MemberInfo[]) =
-        for m in members do
-            printfn "  %d %A" m.MetadataToken m
+//let printAssemblyInfo() =
+//    // http://weblog.ikvm.net/PermaLink.aspx?guid=d28a08bf-0476-41be-a923-60842fdaf8b0
+//    let all =
+//        BindingFlags.Public 
+//        ||| BindingFlags.NonPublic
+//        ||| BindingFlags.Instance
+//        ||| BindingFlags.Static
+//        ||| BindingFlags.DeclaredOnly
+//    use universe = new Universe()
+//    universe.add_AssemblyResolve(
+//        ResolveEventHandler(fun _ args ->
+//            universe.CreateMissingAssembly args.Name))
+//    let writeMembers (members:MemberInfo[]) =
+//        for m in members do
+//            printfn "  %d %A" m.MetadataToken m
+//
+//    let dll = @"C:\Projects\Scout\packages\FSharp.Data.2.0.4\lib\net40\FSharp.Data.dll"
+//    let a = universe.LoadFile dll
+////    a.ManifestModule.
+//    for t in a.GetTypes() do
+//        printfn "  %X %A" t.MetadataToken t
+//        for m in t.GetMembers all do
+//            printfn "    %x %A" m.MetadataToken m
+////        for m in t.GetFields all do
+////            printfn "    %X %A" m.MetadataToken m
+//    ()
 
+let printSourceFileForMethod() =
     let dll = @"C:\Projects\Scout\packages\FSharp.Data.2.0.4\lib\net40\FSharp.Data.dll"
-    let a = universe.LoadFile dll
-//    a.ManifestModule.
-    for t in a.GetTypes() do
-        printfn "  %X %A" t.MetadataToken t
-        for m in t.GetMembers all do
-            printfn "    %x %A" m.MetadataToken m
-//        for m in t.GetFields all do
-//            printfn "    %X %A" m.MetadataToken m
+    let sp = SymbolProvider(Path.GetDirectoryName dll, SymbolProvider.SymSearchPolicies.AllowReferencePathAccess)
+//    let sr = sp.GetSymbolReaderForFile dll
+//    Http.AsyncRequest
+    let mi = (typeof<Http>.GetMember "AsyncRequest").[0]
+    printfn "%s %d" mi.Module.FullyQualifiedName mi.MetadataToken 
+    let sl = sp.GetSourceLoc(mi.Module.FullyQualifiedName, mi.MetadataToken, 0)
+    printfn "%s %d %d %d %d" sl.Url sl.StartLine sl.StartCol sl.EndLine sl.EndCol
     ()
 
 [<EntryPoint>]
 let main argv =
+    printSourceFileForMethod()
 //    printPdbInfo()
     printUrlAndDownload()
 //    printAssemblyInfo()

@@ -65,15 +65,16 @@ namespace Microsoft.Samples.SimplePDBReader
         /// <returns>A string of the format [filepath]:[line] (eg. "C:\temp\foo.cs:123"), or null
         /// if a matching PDB couldn't be found</returns>
         /// <remarks>Thows various COMExceptions (from DIA SDK error values) if a PDB couldn't be opened/read</remarks>
-        public SourceLoc GetSourceLoc(MethodBase method, int ilOffset)
+        //public SourceLoc GetSourceLoc(MethodBase method, int ilOffset)
+        public SourceLoc GetSourceLoc(string modulePath, int methodMetadataToken, int ilOffset)
         {
             // Get the symbol reader corresponding to the module of the supplied method
-            string modulePath = method.Module.FullyQualifiedName;
+            //string modulePath = method.Module.FullyQualifiedName;
             ISymUnmanagedReader symReader = GetSymbolReaderForFile(modulePath);
             if (symReader == null)
                 return null;    // no PDBs
 
-            ISymUnmanagedMethod symMethod = symReader.GetMethod(new SymbolToken(method.MetadataToken));
+            ISymUnmanagedMethod symMethod = symReader.GetMethod(new SymbolToken(methodMetadataToken));
 
             // Get all the sequence points for the method
             int count = symMethod.GetSequencePointCount();
@@ -118,6 +119,7 @@ namespace Microsoft.Samples.SimplePDBReader
         {
             // First we need to get a metadata importer for the module to provide to the symbol reader
             Guid importerIID = typeof(IMetaDataImport).GUID;
+            //http://msdn.microsoft.com/en-us/library/ms231248.aspx
             IMetaDataImport importer = m_metadataDispenser.OpenScope(modulePath, 0, ref importerIID);
 
             // Call ISymUnmanagedBinder2.GetReaderForFile2 to load the PDB file (if any)
