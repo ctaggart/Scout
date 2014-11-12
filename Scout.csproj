@@ -3,7 +3,7 @@
   <PropertyGroup>
     <RootNamespace>ReSharper.Scout</RootNamespace>
     <ProjectGuid>{E3AD5CE7-900E-50EF-A012-F5ACF9C520DA}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <StartupObject>
     </StartupObject>
     <FileUpgradeFlags>
@@ -18,8 +18,8 @@
     <OutputType>Library</OutputType>
     <ReSharperVersion>50</ReSharperVersion>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\bin\Debug50\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RS50</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>default</LangVersion>
@@ -31,13 +31,16 @@
     <AssemblyName>Scout</AssemblyName>
     <OutputType>Library</OutputType>
     <ReSharperVersion>50</ReSharperVersion>
-    <OutputPath>..\bin\Release$(ReSharperVersion)\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;RS50</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>Scout</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -55,11 +58,6 @@
     <Reference Include="microsoft.visualstudio.shell.interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\microsoft.visualstudio.shell.interop.8.0.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Zip, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Microsoft.VisualStudio.Zip.dll</HintPath>
-      <Aliases>VS8</Aliases>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Zip.9.0, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
