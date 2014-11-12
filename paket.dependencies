@@ -1,0 +1,4 @@
+source http://nuget.org/api/v2
+
+nuget SourceLink
+nuget FSharp.Data 2.0.4

@@ -1,8 +1,14 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{931DD45A-FA75-43D3-ACFF-5912E92702D6}"
+	ProjectSection(SolutionItems) = preProject
+		..\scoutplugin\paket.dependencies = ..\scoutplugin\paket.dependencies
+		..\scoutplugin\paket.lock = ..\scoutplugin\paket.lock
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scout", "Scout.csproj", "{E3AD5CE7-900E-50EF-A012-F5ACF9C520DA}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Test", "Test\Test.fsproj", "{3190FFAC-1A50-479E-8F95-FAB2A280A154}"

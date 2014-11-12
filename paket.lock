@@ -1,0 +1,8 @@
+NUGET
+  remote: http://nuget.org/api/v2
+  specs:
+    FSharp.Data (2.0.4)
+      Zlib.Portable (>= 1.9.2) - portable-7.0
+      Zlib.Portable (>= 1.9.2) - portable-7.0
+    SourceLink (0.4.2)
+    Zlib.Portable (1.10.0)
