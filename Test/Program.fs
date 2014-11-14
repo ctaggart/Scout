@@ -174,27 +174,7 @@ let printMethods() =
         for m in dt.GetMembers() do
             printfn "  %d %s" m.MetadataToken m.Name
 
-let printPdbDocuments() =
-    let a = @"C:\Projects\scoutplugin\packages\SourceLink\lib\net45\SourceLink.pdb"
-    use s = File.OpenRead a
 
-//    let r = new PdbReader(s)
-
-    let sc = SymbolCache @"C:\tmp\cache"
-    let r = sc.ReadPdb a s
-
-    for d in r.Documents do
-        printfn "%s" d.URL
-        printfn "  %A" (d.GetCheckSum())
-        
-        let url = r.GetDownloadUrl d.URL
-        printfn "  %s" url
-        let downloadedFile = sc.DownloadFile url
-        printfn "  %s" downloadedFile
-
-
-
-    ()
 
 //let printUsingMdbg() =
 //    let a = @"C:\Projects\scoutplugin\packages\SourceLink\lib\net45\SourceLink.pdb"
@@ -223,11 +203,11 @@ let printPdbDocuments() =
         
     ()
 
-[<EntryPoint>]
-let main argv =
+//[<EntryPoint>]
+//let main argv =
 
 //    printUsingMdbg()
-    printPdbDocuments()
+//    printPdbDocuments()
 
 //    printSourceFileForMethod()
 //    printPdbInfo()

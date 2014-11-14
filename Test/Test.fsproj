@@ -62,11 +62,10 @@
   -->
   <Import Project="..\.paket\paket.targets" />
   <ItemGroup>
-    <Compile Include="PdbReader.fs" />
-    <Compile Include="MetaDataImport.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="printfn.fs" />
     <None Include="App.config" />
     <None Include="paket.references" />
+    <Compile Include="Program2.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -107,6 +106,11 @@
               <Private>True</Private>
               <Paket>True</Paket>
             </Reference>
+            <Reference Include="SourceLink">
+              <HintPath>..\packages\SourceLink\lib\net45\SourceLink.dll</HintPath>
+              <Private>True</Private>
+              <Paket>True</Paket>
+            </Reference>
           </ItemGroup>
         </Otherwise>
       </Choose>
@@ -115,6 +119,11 @@
       <ItemGroup>
         <Reference Include="SourceLink.SymbolStore">
           <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+        <Reference Include="SourceLink">
+          <HintPath>..\packages\SourceLink\lib\net45\SourceLink.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -127,12 +136,22 @@
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
+        <Reference Include="SourceLink">
+          <HintPath>..\packages\SourceLink\lib\net45\SourceLink.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == 'Silverlight'">
       <ItemGroup>
         <Reference Include="SourceLink.SymbolStore">
           <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+        <Reference Include="SourceLink">
+          <HintPath>..\packages\SourceLink\lib\net45\SourceLink.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -145,6 +164,11 @@
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
+        <Reference Include="SourceLink">
+          <HintPath>..\packages\SourceLink\lib\net45\SourceLink.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == 'WindowsPhoneApp'">
@@ -154,12 +178,22 @@
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
+        <Reference Include="SourceLink">
+          <HintPath>..\packages\SourceLink\lib\net45\SourceLink.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
         <Reference Include="SourceLink.SymbolStore">
           <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+        <Reference Include="SourceLink">
+          <HintPath>..\packages\SourceLink\lib\net45\SourceLink.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
