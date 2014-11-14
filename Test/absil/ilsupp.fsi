@@ -7,8 +7,10 @@
 /// The implementation of the functions can be found in ilsupp-*.fs
 //module internal Microsoft.FSharp.Compiler.AbstractIL.Internal.Support
 module SourceLink.AbstractIL.Support
+open System.Diagnostics.SymbolStore
 
-type PdbReader
+//type PdbReader
+type PdbReader = { symReader: ISymbolReader }
 type PdbWriter
 val pdbReadClose: PdbReader -> unit
 val pdbInitialize : string -> string -> PdbWriter
@@ -41,7 +43,7 @@ val linkNativeResources: unlinkedResources:byte[] list ->  rva:int32 -> PEFileTy
 val unlinkResource: int32 -> byte[] -> byte[]
 
 /// PDB reader and associated types
-type PdbDocument
+type PdbDocument = { symDocument: ISymbolDocument }
 type PdbMethod
 type PdbVariable
 type PdbMethodScope

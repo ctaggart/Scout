@@ -37,60 +37,6 @@
     <DocumentationFile>bin\Release\Test.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="ISymWrapper" />
-    <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="absil\filename.fsi" />
-    <Compile Include="absil\filename.fs" />
-    <Compile Include="absil\flatlist.fs" />
-    <Compile Include="absil\bytes.fsi" />
-    <Compile Include="absil\bytes.fs" />
-    <!--<Compile Include="il.fs" />
-    <Compile Include="il.fsi" />
-    <Compile Include="ilascii.fs" />
-    <Compile Include="ilascii.fsi" />
-    <Compile Include="ilbinary.fs" />
-    <Compile Include="ilbinary.fsi" />
-    <Compile Include="ildiag.fs" />
-    <Compile Include="ildiag.fsi" />-->
-    <Compile Include="absil\illib.fs" />
-    <!--<Compile Include="ilmorph.fs" />
-    <Compile Include="ilmorph.fsi" />
-    <Compile Include="ilprint.fs" />
-    <Compile Include="ilprint.fsi" />
-    <Compile Include="ilread.fs" />
-    <Compile Include="ilread.fsi" />
-    <Compile Include="ilreflect.fs" />-->
-    <Compile Include="absil\ilsupp.fsi" />
-    <Compile Include="absil\ilsupp.fs" />
-    <!--<Compile Include="ilwrite.fs" />
-    <Compile Include="ilwrite.fsi" />
-    <Compile Include="ilx.fs" />
-    <Compile Include="ilx.fsi" />
-    <Compile Include="zmap.fs" />
-    <Compile Include="zmap.fsi" />
-    <Compile Include="zset.fs" />
-    <Compile Include="zset.fsi" />-->
-    <Compile Include="MetaDataImport.fs" />
-    <Compile Include="Program.fs" />
-    <None Include="App.config" />
-    <None Include="paket.references" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Scout.csproj">
-      <Name>Scout</Name>
-      <Project>{e3ad5ce7-900e-50ef-a012-f5acf9c520da}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
@@ -115,4 +61,109 @@
   </Target>
   -->
   <Import Project="..\.paket\paket.targets" />
+  <ItemGroup>
+    <Compile Include="PdbReader.fs" />
+    <Compile Include="MetaDataImport.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="App.config" />
+    <None Include="paket.references" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\packages\System.Collections.Immutable.1.1.32-beta\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>..\packages\System.Reflection.Metadata.1.0.17-beta\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework'">
+      <Choose>
+        <When Condition="$(TargetFrameworkVersion) == 'v1.0'">
+        </When>
+        <When Condition="$(TargetFrameworkVersion) == 'v1.1'">
+        </When>
+        <When Condition="$(TargetFrameworkVersion) == 'v2.0'">
+        </When>
+        <When Condition="$(TargetFrameworkVersion) == 'v3.5'">
+        </When>
+        <When Condition="$(TargetFrameworkVersion) == 'v4.0' And $(TargetFrameworkProfile) == 'Client'">
+        </When>
+        <When Condition="$(TargetFrameworkVersion) == 'v4.0'">
+        </When>
+        <Otherwise>
+          <ItemGroup>
+            <Reference Include="SourceLink.SymbolStore">
+              <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+              <Private>True</Private>
+              <Paket>True</Paket>
+            </Reference>
+          </ItemGroup>
+        </Otherwise>
+      </Choose>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == 'MonoAndroid'">
+      <ItemGroup>
+        <Reference Include="SourceLink.SymbolStore">
+          <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == 'MonoTouch'">
+      <ItemGroup>
+        <Reference Include="SourceLink.SymbolStore">
+          <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == 'Silverlight'">
+      <ItemGroup>
+        <Reference Include="SourceLink.SymbolStore">
+          <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == 'Windows'">
+      <ItemGroup>
+        <Reference Include="SourceLink.SymbolStore">
+          <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == 'WindowsPhoneApp'">
+      <ItemGroup>
+        <Reference Include="SourceLink.SymbolStore">
+          <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="SourceLink.SymbolStore">
+          <HintPath>..\packages\SourceLink.SymbolStore\lib\net45\SourceLink.SymbolStore.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
 </Project>

@@ -1,8 +1,11 @@
-﻿using System;
+﻿// derived from MIT licensed ReSharper.Scout.DebugSymbols
+// https://code.google.com/p/scoutplugin/source/browse/trunk/src/DebugSymbols/SymSrv.cs?r=31
+
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace ReSharper.Scout.DebugSymbols
+namespace SourceLink.SymbolStore
 {
     public static class SymSrv
     {

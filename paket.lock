@@ -6,3 +6,6 @@ NUGET
       Zlib.Portable (>= 1.9.2) - portable-7.0
     SourceLink (0.4.2)
     Zlib.Portable (1.10.0)
+  remote: https://ci.appveyor.com/nuget/sourcelink-helmesfwai2a
+  specs:
+    SourceLink.SymbolStore (0.5.0-ci1411132120)

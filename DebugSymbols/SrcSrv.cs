@@ -1,41 +1,41 @@
-﻿using System;
+﻿// derived from MIT licensed ReSharper.Scout.DebugSymbols
+// https://code.google.com/p/scoutplugin/source/browse/trunk/src/DebugSymbols/SrcSrv.cs?r=23
+
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace ReSharper.Scout.DebugSymbols
+namespace SourceLink.SymbolStore
 {
-    public class SrcSrv
+    [
+        ComImport,
+        Guid("997DD0CC-A76F-4c82-8D79-EA87559D27AD"),
+        InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+        ComVisible(false)
+    ]
+    public interface ISymUnmanagedSourceServerModule
     {
-        //public static readonly SrcSrv Instance = new SrcSrv();
+        [PreserveSig]
+        int GetSourceServerData(out uint dataByteCount, out IntPtr data);
+    };
 
-        private readonly IntPtr _cookie;
-
-        public SrcSrv()//: this(System.Diagnostics.Process.GetCurrentProcess().Handle)
+    public static class SrcSrv
+    {
+        public static void Init(IntPtr sessionCookie, string symbolCacheDir)
         {
-        }
-
-        public SrcSrv(IntPtr cookie)
-        {
-            // Session cookie. Must be an unique value.
-            _cookie = cookie;
-
-            // Initialize SrcSrv.dll
-            //
             SrcSrvSetOptions(1);
-            //SrcSrvSetParentWindow(ReSharper.VsShell.MainWindow.Handle); // TODO 
-            //SrcSrvInit(cookie, Options.SymbolCacheDir);
-            SrcSrvInit(cookie, @"C:\tmp\cache");
+            SrcSrvInit(sessionCookie, symbolCacheDir);
         }
 
-        public long LoadModule(string moduleFilePath, ISymUnmanagedSourceServerModule sourceServerModule)
+        public static long LoadModule(IntPtr sessionCookie, string moduleFilePath, ISymUnmanagedSourceServerModule sourceServerModule)
         {
             if (moduleFilePath     == null) throw new ArgumentNullException("moduleFilePath");
             if (sourceServerModule == null) throw new ArgumentNullException("sourceServerModule");
 
             long moduleCookie = ((long)moduleFilePath.ToLower().GetHashCode()) << 30;
 
-            if (SrcSrvIsModuleLoaded(_cookie, moduleCookie))
+            if (SrcSrvIsModuleLoaded(sessionCookie, moduleCookie))
             {
                 // Already loaded.
                 //
@@ -55,7 +55,7 @@ namespace ReSharper.Scout.DebugSymbols
 
             try
             {
-                return SrcSrvLoadModule(_cookie, Path.GetFileName(moduleFilePath),
+                return SrcSrvLoadModule(sessionCookie, Path.GetFileName(moduleFilePath),
                     moduleCookie, data, dataByteCount)? moduleCookie: 0L;
             }
             finally
@@ -64,13 +64,13 @@ namespace ReSharper.Scout.DebugSymbols
             }
         }
 
-        public string GetFileUrl(string sourceFilePath, long moduleCookie)
+        public string GetFileUrl(IntPtr sessionCookie, string sourceFilePath, long moduleCookie)
         {
             if (sourceFilePath == null) throw new ArgumentNullException("sourceFilePath");
 
             StringBuilder url = new StringBuilder(2048);
 
-            return SrcSrvGetFile(_cookie, moduleCookie, sourceFilePath,
+            return SrcSrvGetFile(sessionCookie, moduleCookie, sourceFilePath,
                 null, url, (uint)url.Capacity)? url.ToString(): null;
         }
 
@@ -85,7 +85,7 @@ namespace ReSharper.Scout.DebugSymbols
 
         [DllImport(module, SetLastError = true, CharSet=CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SrcSrvInit(IntPtr sessionCookie, string workingFolder);
+        public static extern bool SrcSrvInit(IntPtr sessionCookie, string symbolCacheDir);
 
         public delegate bool SrcSrvCallbackProc(uint @event, long param1, long param2);
 

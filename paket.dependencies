@@ -1,4 +1,6 @@
 source http://nuget.org/api/v2
+source https://ci.appveyor.com/nuget/sourcelink-helmesfwai2a
 
 nuget SourceLink
 nuget FSharp.Data 2.0.4
+nuget SourceLink.SymbolStore prerelease

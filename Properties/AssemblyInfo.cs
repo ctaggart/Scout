@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany(AssemblyInfo.Company)]
 [assembly: AssemblyVersion(AssemblyInfo.Version)]
 [assembly: AssemblyFileVersion(AssemblyInfo.Version)]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Test")]
 
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
