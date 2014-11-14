@@ -1,4 +1,4 @@
-﻿module Program2
+﻿module Program
 
 open System.IO
 open SourceLink
@@ -12,13 +12,13 @@ let printPdbDocuments() =
     let r = sc.ReadPdb(s, a)
 
     for d in r.Documents do
-        printfn "\n%s" d.URL
-        printfn "  %s" (Hex.encode (d.GetCheckSum()))
+        printfn "\npdb original source file path: %s" d.URL
+        printfn "it had an md5 checksum of: %s" (d.GetCheckSum() |> Hex.encode)
         let url = r.GetDownloadUrl d.URL
-        printfn "  %s" url
+        printfn "has download url if source indexed: %s" url
         let downloadedFile = sc.DownloadFile url
-        printfn "  %s" downloadedFile
-    ()
+        printfn "downloaded the file to the cache %s" downloadedFile
+        printfn "downloaded file has md5 of: %s" (Crypto.hashMD5 downloadedFile |> Hex.encode)
 
 [<EntryPoint>]
 let main argv =
